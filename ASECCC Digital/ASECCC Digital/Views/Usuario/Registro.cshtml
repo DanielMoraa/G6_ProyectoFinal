@@ -1,0 +1,70 @@
+﻿@model UsuarioModel
+
+@{
+    Layout = "_LayoutExterno";
+}
+<div class="loader-bg">
+    <div class="loader-track">
+        <div class="loader-fill"></div>
+    </div>
+</div>
+<div class="auth-main">
+    <div class="auth-wrapper v3">
+        <div class="auth-form">
+            <div class="auth-header">
+                <a asp-controller="Usuario" asp-action="Registro"><img src="~/lib/img/ASECCC_LOGO3.1.png" alt="Logo"></a>
+            </div>
+            <div class="card my-5">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-end mb-4">
+                        <h3 class="mb-0"><b>Crear Cuenta</b></h3>
+                        <a asp-controller="Usuario" asp-action="Login" class="link-primary">¿Ya tienes una cuenta?</a>
+                    </div>
+
+                    <form asp-action="Registro" asp-controller="Usuario" method="POST">
+                        <div class="form-group mb-3">
+                            <label class="form-label">Identificación</label>
+                            <input type="text" class="form-control" asp-for="Identificacion" id="txtIdentificacion" name="txtIdentificacion" onkeyup="ConsultarNombre()" />
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="form-label">Nombre</label>
+                            <input type="text" class="form-control" asp-for="Nombre" id="txtNombre" name="txtNombre" readonly/>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="form-label">Correo Electrónico</label>
+                            <input type="email" class="form-control" asp-for="CorreoElectronico" />
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="form-label">Contraseña</label>
+                            <div class="input-group input-group-merge">
+                                <input type="password" class="form-control" asp-for="Contrasenna" />
+                            </div>
+                        </div>
+
+                        <div class="d-grid mt-4">
+                            <button type="submit" class="btn btn-primary">Procesar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="auth-footer row">
+                <div class="col my-1">
+                    <p class="m-0">© <a href="#">ASECCC Digital </a> @DateTime.Now.Year </p>
+                </div>
+                <div class="col-auto my-1">
+                    <ul class="list-inline footer-link mb-0">
+                        <li class="list-inline-item"><a href="#">Inicio</a></li>
+                        <li class="list-inline-item"><a href="#">Política de Privacidad</a></li>
+                        <li class="list-inline-item"><a href="#">Contáctanos</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+

@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36429.23
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ASECCC Digital", "ASECCC Digital\ASECCC Digital.csproj", "{17AB9579-ECF3-4E47-B5DE-1FF635646518}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ASECCC API", "ASECCC API\ASECCC API.csproj", "{C2CD992B-6DFA-4543-845A-88F2F9FA13CC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{17AB9579-ECF3-4E47-B5DE-1FF635646518}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{17AB9579-ECF3-4E47-B5DE-1FF635646518}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{17AB9579-ECF3-4E47-B5DE-1FF635646518}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{17AB9579-ECF3-4E47-B5DE-1FF635646518}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C2CD992B-6DFA-4543-845A-88F2F9FA13CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C2CD992B-6DFA-4543-845A-88F2F9FA13CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C2CD992B-6DFA-4543-845A-88F2F9FA13CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C2CD992B-6DFA-4543-845A-88F2F9FA13CC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {376060BC-D707-46A5-9C6E-E51B934C6616}
+	EndGlobalSection
+EndGlobal
