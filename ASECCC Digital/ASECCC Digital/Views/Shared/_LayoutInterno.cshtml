@@ -31,7 +31,7 @@
 <nav class="pc-sidebar">
   <div class="navbar-wrapper">
     <div class="m-header">
-      <a href="../dashboard/index.html" class="b-brand text-primary">
+      <a asp-controller="Home" asp-action="Principal" class="b-brand text-primary">
         <!-- ========   Change your logo from here   ============ -->
         <img src="~/lib/img/ASECCC_LOGO3.1.png" alt="Logo">
       </a>
@@ -39,7 +39,7 @@
     <div class="navbar-content">
       <ul class="pc-navbar">
         <li class="pc-item">
-          <a href="../dashboard/index.html" class="pc-link">
+            <a href="" class="pc-link">
             <span class="pc-micon"><i class="ti ti-dashboard"></i></span>
             <span class="pc-mtext">Dashboard</span>
           </a>
@@ -52,15 +52,15 @@
           <i class="ti ti-news"></i>
         </li>
         <li class="pc-item">
-          <a href="../pages/login.html" class="pc-link">
+          <a asp-controller="Usuario" asp-action="Login" class="pc-link">
             <span class="pc-micon"><i class="ti ti-lock"></i></span>
             <span class="pc-mtext">Login</span>
           </a>
         </li>
         <li class="pc-item">
-          <a href="../pages/register.html" class="pc-link">
+          <a asp-controller="Usuario" asp-action="Registro" class="pc-link">
             <span class="pc-micon"><i class="ti ti-user-plus"></i></span>
-            <span class="pc-mtext">Register</span>
+            <span class="pc-mtext">Registro</span>
           </a>
         </li>
 
@@ -235,7 +235,7 @@
                                 <h5 class="m-b-10">Principal</h5>
                             </div>
                             <ul class="breadcrumb">
-                                <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Home</a></li>
+                                <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Principal">Home</a></li>
                                 <li class="breadcrumb-item" aria-current="page">Principal</li>
                             </ul>
                         </div>
@@ -253,11 +253,6 @@
             <div class="row">
                 <div class="col-sm my-1">
                     <p class="m-0">© ASECCC Digital @DateTime.Now.Year, Made by <a href="https://themeforest.net/user/codedthemes" target="_blank">Codedthemes</a> & <a href="https://themewagon.com/">ThemeWagon</a>.</p>
-                </div>
-                <div class="col-auto my-1">
-                    <ul class="list-inline footer-link mb-0">
-                        <li class="list-inline-item"><a href="../index.html">Home</a></li>
-                    </ul>
                 </div>
             </div>
         </div>
