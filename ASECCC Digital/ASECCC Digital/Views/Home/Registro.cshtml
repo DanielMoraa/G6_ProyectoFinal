@@ -1,0 +1,192 @@
+﻿@model UsuarioModel
+
+@{
+    Layout = "_LayoutExterno";
+}
+<div class="loader-bg">
+    <div class="loader-track">
+        <div class="loader-fill"></div>
+    </div>
+</div>
+<div class="auth-main">
+    <div class="auth-wrapper v3">
+        <div class="auth-form">
+            <div class="auth-header">
+                <a asp-controller="Home" asp-action="Registro"><img src="~/lib/img/ASECCC_LOGO3.1.png" alt="Logo"></a>
+            </div>
+            <div class="card my-5">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-end mb-4">
+                        <h3 class="mb-0"><b>Crear Cuenta</b></h3>
+                        <a asp-controller="Home" asp-action="Login" class="link-primary">¿Ya tienes una cuenta?</a>
+                    </div>
+
+                    <form id="FormRegistro" asp-action="Registro" asp-controller="Home">
+                        <div class="form-group mb-3">
+                            <label class="form-label">Nombre</label>
+                            <input type="text" class="form-control" asp-for="NombreCompleto" readonly />
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="form-label">Correo Electrónico</label>
+                            <input type="email" class="form-control" asp-for="CorreoElectronico" />
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="form-label">Contraseña</label>
+                            <div class="input-group input-group-merge">
+                                <input type="password" class="form-control" asp-for="Contrasena" />
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="form-label">Tipo de identificación</label>
+                            <select class="form-control" asp-for="TipoIdentificacion">
+                                <option value="">Seleccione un tipo</option>
+                                <option value="Nacional">Nacional</option>
+                                <option value="DIMEX">DIMEX</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="form-label">Identificación</label>
+                            <input type="text" class="form-control" asp-for="Identificacion" onkeyup="ConsultarNombre()" />
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="form-label">Fecha Nacimiento</label>
+                            <input type="date" class="form-control" asp-for="FechaNacimiento">
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="form-label">Teléfono</label>
+                            <input type="text" class="form-control" asp-for="Telefono"/>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="form-label">Dirección</label>
+                            <input type="text" class="form-control" asp-for="Direccion"/>
+                        </div>
+
+                        <div class="d-grid mt-4">
+                            <button type="submit" class="btn btn-primary">Procesar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="auth-footer row">
+                <div class="col my-1">
+                    <p class="m-0">© <a href="#">ASECCC Digital </a> @DateTime.Now.Year </p>
+                </div>
+                <div class="col-auto my-1">
+                    <ul class="list-inline footer-link mb-0">
+                        <li class="list-inline-item"><a href="#">Inicio</a></li>
+                        <li class="list-inline-item"><a href="#">Política de Privacidad</a></li>
+                        <li class="list-inline-item"><a href="#">Contáctenos</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    $(document).ready(function () {
+
+        // ----- Manejo de mensajes desde TempData -----
+        const mensaje = '@TempData["Mensaje"]';
+        const mensajeTipo = '@TempData["MensajeTipo"]';
+        const errores = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(TempData["Errores"] ?? new string[0]));
+
+        if (mensaje) {
+            Swal.fire({
+                icon: mensajeTipo === 'success' ? 'success' : 'error',
+                title: mensajeTipo === 'success' ? '¡Éxito!' : 'Error',
+                text: mensaje,
+                confirmButtonColor: mensajeTipo === 'success' ? '#28a745' : '#dc3545'
+            });
+        }
+
+        if (errores && errores.length > 0) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Errores de validación',
+                html: '<ul style="text-align: left;">' + errores.map(e => `<li>${e}</li>`).join('') + '</ul>',
+                confirmButtonColor: '#dc3545'
+            });
+        }
+
+        // ----- Inputs referenciados por asp-for -----
+        const $tipoIdentificacion = $('[name="TipoIdentificacion"]');
+        const $identificacion = $('[name="Identificacion"]');
+        const $telefono = $('[name="Telefono"]');
+        const $contrasena = $('[name="Contrasena"]');
+        const $fechaNacimiento = $('[name="FechaNacimiento"]');
+
+        // --- Formatear Identificación ---
+        $identificacion.on('input', function () {
+            let tipo = $tipoIdentificacion.val();
+            let value = $identificacion.val().replace(/[^0-9]/g, '');
+
+            if (tipo === "Nacional") {
+                if (value.length > 9) value = value.slice(0, 9);
+                if (value.length > 5) value = value.replace(/^(\d{1})(\d{4})(\d+)/, '$1-$2-$3');
+                else if (value.length > 1) value = value.replace(/^(\d{1})(\d+)/, '$1-$2');
+            } else if (tipo === "DIMEX") {
+                if (value.length > 12) value = value.slice(0, 12);
+            }
+
+            $identificacion.val(value);
+        });
+
+        // Reset identificación al cambiar tipo
+        $tipoIdentificacion.on('change', () => $identificacion.val(''));
+
+        // --- Formatear teléfono ---
+        $telefono.on('input', function () {
+            let value = $telefono.val().replace(/[^0-9]/g, '');
+            if (value.length > 8) value = value.slice(0, 8);
+            $telefono.val(value);
+        });
+
+        // --- Funciones de validación ---
+        const validarIdentificacion = (value, tipo) =>
+            tipo === "Nacional" ? /^\d{1}-\d{4}-\d{4}$/.test(value) :
+            tipo === "DIMEX" ? /^\d{12}$/.test(value) : false;
+
+        const validarTelefono = tel => /^\d{8}$/.test(tel);
+        const validarContrasena = pass => pass.length >= 6;
+
+        // --- Validación del formulario al enviar ---
+        $('#FormRegistro').on('submit', function (event) {
+
+            const tipo = $tipoIdentificacion.val();
+            const ident = $identificacion.val();
+            const tel = $telefono.val();
+            const pass = $contrasena.val().trim();
+            const fecha = $fechaNacimiento.val();
+
+            if (!tipo) return mostrarError("Tipo de identificación requerido", "Debe seleccionar un tipo.");
+            if (!validarIdentificacion(ident, tipo)) return mostrarError("Identificación inválida", "Verifica el formato según el documento.");
+            if (!validarTelefono(tel)) return mostrarError("Teléfono inválido", "Debe contener 8 dígitos.");
+            if (!validarContrasena(pass)) return mostrarError("Contraseña muy corta", "Debe tener mínimo 6 caracteres.");
+            if (!fecha) return mostrarError("Fecha requerida", "Debe ingresar una fecha de nacimiento.");
+
+            function mostrarError(titulo, texto) {
+                Swal.fire({
+                    icon: 'error',
+                    title: titulo,
+                    text: texto,
+                    confirmButtonColor: '#dc3545'
+                });
+                event.preventDefault();
+            }
+        });
+
+    });
+</script>
+
+
+
+

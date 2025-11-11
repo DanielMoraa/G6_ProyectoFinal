@@ -1,18 +1,20 @@
 function ConsultarNombre() {
-    //let identificacion = document.getElementById("txtIdentificacion").value;
-    let identificacion = $("#txtIdentificacion").val();
 
-    document.getElementById("txtNombre").value = "";
-    //$("#txtNombre").val("");
+    let identificacion = $("#Identificacion").val();
+    $("#NombreCompleto").val("");
 
     if (identificacion.length >= 9) {
+
         $.ajax({
+            type: 'GET',
             url: 'https://apis.gometa.org/cedulas/' + identificacion,
-            method: 'GET',
+            dataType: 'json',
             success: function (data) {
-                document.getElementById("txtNombre").value = data.nombre;
-                //$("#txtNombre").val(data.nombre);
+                if (data.resultcount > 0) {
+                    $("#NombreCompleto").val(data.nombre);
+                }
             }
         });
+
     }
 }

@@ -9,20 +9,21 @@
     </div>
 </div>
 
+
 <div class="auth-main">
     <div class="auth-wrapper v3">
         <div class="auth-form">
             <div class="auth-header">
-                <a asp-controller="Usuario" asp-action="Registro"><img src="~/lib/img/ASECCC_LOGO3.1.png" alt="Logo"></a>
+                <a asp-controller="Home" asp-action="Registro"><img src="~/lib/img/ASECCC_LOGO3.1.png" alt="Logo"></a>
             </div>
             <div class="card my-5">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-end mb-4">
                         <h3 class="mb-0"><b>Iniciar Sesión</b></h3>
-                        <a asp-controller="Usuario" asp-action="Registro">¿No tiene una cuenta?</a>
+                        <a asp-controller="Home" asp-action="Registro">¿No tiene una cuenta?</a>
                     </div>
 
-                    <form asp-action="Login" asp-controller="Usuarios" method="POST" id="loginForm">
+                    <form asp-action="Login" asp-controller="Home" method="POST" id="loginForm">
                         <div class="form-group mb-3">
                             <label class="form-label">Tipo de Identificación</label>
                             <select class="form-control" name="tipoIdentificacion" id="tipoIdentificacion">
@@ -74,3 +75,5 @@
         </div>
     </div>
 </div>
+
+<script src="~/js/Login.js" asp-append-version="true"></script>
