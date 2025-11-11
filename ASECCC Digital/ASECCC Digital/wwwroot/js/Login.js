@@ -1,5 +1,5 @@
 ﻿document.addEventListener('DOMContentLoaded', function () {
-    const loginForm = document.getElementById('loginForm');
+    const loginForm = document.getElementById('FormInicioSesion');
     const tipoIdentificacion = document.getElementById('tipoIdentificacion');
     const identificacion = document.getElementById('Identificacion');
     const contrasenna = document.getElementById('Contrasenna');

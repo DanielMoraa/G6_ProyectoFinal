@@ -73,7 +73,7 @@ namespace ASECCC_Digital.Controllers
                     var datosApi = respuesta.Content.ReadFromJsonAsync<int>().Result;
 
                     if (datosApi > 0)
-                        return RedirectToAction("Principal", "Home");
+                        return RedirectToAction("Login", "Home");
                 }
 
                 ViewBag.Mensaje = "No se ha registrado la información";

@@ -88,104 +88,16 @@
             </div>
         </div>
     </div>
+
+
 </div>
 
+<script src="~/js/Registro.js" asp-append-version="true"></script>
 
-<script>
-    $(document).ready(function () {
 
-        // ----- Manejo de mensajes desde TempData -----
-        const mensaje = '@TempData["Mensaje"]';
-        const mensajeTipo = '@TempData["MensajeTipo"]';
-        const errores = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(TempData["Errores"] ?? new string[0]));
 
-        if (mensaje) {
-            Swal.fire({
-                icon: mensajeTipo === 'success' ? 'success' : 'error',
-                title: mensajeTipo === 'success' ? '¡Éxito!' : 'Error',
-                text: mensaje,
-                confirmButtonColor: mensajeTipo === 'success' ? '#28a745' : '#dc3545'
-            });
-        }
 
-        if (errores && errores.length > 0) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Errores de validación',
-                html: '<ul style="text-align: left;">' + errores.map(e => `<li>${e}</li>`).join('') + '</ul>',
-                confirmButtonColor: '#dc3545'
-            });
-        }
 
-        // ----- Inputs referenciados por asp-for -----
-        const $tipoIdentificacion = $('[name="TipoIdentificacion"]');
-        const $identificacion = $('[name="Identificacion"]');
-        const $telefono = $('[name="Telefono"]');
-        const $contrasena = $('[name="Contrasena"]');
-        const $fechaNacimiento = $('[name="FechaNacimiento"]');
-
-        // --- Formatear Identificación ---
-        $identificacion.on('input', function () {
-            let tipo = $tipoIdentificacion.val();
-            let value = $identificacion.val().replace(/[^0-9]/g, '');
-
-            if (tipo === "Nacional") {
-                if (value.length > 9) value = value.slice(0, 9);
-                if (value.length > 5) value = value.replace(/^(\d{1})(\d{4})(\d+)/, '$1-$2-$3');
-                else if (value.length > 1) value = value.replace(/^(\d{1})(\d+)/, '$1-$2');
-            } else if (tipo === "DIMEX") {
-                if (value.length > 12) value = value.slice(0, 12);
-            }
-
-            $identificacion.val(value);
-        });
-
-        // Reset identificación al cambiar tipo
-        $tipoIdentificacion.on('change', () => $identificacion.val(''));
-
-        // --- Formatear teléfono ---
-        $telefono.on('input', function () {
-            let value = $telefono.val().replace(/[^0-9]/g, '');
-            if (value.length > 8) value = value.slice(0, 8);
-            $telefono.val(value);
-        });
-
-        // --- Funciones de validación ---
-        const validarIdentificacion = (value, tipo) =>
-            tipo === "Nacional" ? /^\d{1}-\d{4}-\d{4}$/.test(value) :
-            tipo === "DIMEX" ? /^\d{12}$/.test(value) : false;
-
-        const validarTelefono = tel => /^\d{8}$/.test(tel);
-        const validarContrasena = pass => pass.length >= 6;
-
-        // --- Validación del formulario al enviar ---
-        $('#FormRegistro').on('submit', function (event) {
-
-            const tipo = $tipoIdentificacion.val();
-            const ident = $identificacion.val();
-            const tel = $telefono.val();
-            const pass = $contrasena.val().trim();
-            const fecha = $fechaNacimiento.val();
-
-            if (!tipo) return mostrarError("Tipo de identificación requerido", "Debe seleccionar un tipo.");
-            if (!validarIdentificacion(ident, tipo)) return mostrarError("Identificación inválida", "Verifica el formato según el documento.");
-            if (!validarTelefono(tel)) return mostrarError("Teléfono inválido", "Debe contener 8 dígitos.");
-            if (!validarContrasena(pass)) return mostrarError("Contraseña muy corta", "Debe tener mínimo 6 caracteres.");
-            if (!fecha) return mostrarError("Fecha requerida", "Debe ingresar una fecha de nacimiento.");
-
-            function mostrarError(titulo, texto) {
-                Swal.fire({
-                    icon: 'error',
-                    title: titulo,
-                    text: texto,
-                    confirmButtonColor: '#dc3545'
-                });
-                event.preventDefault();
-            }
-        });
-
-    });
-</script>
 
 
 

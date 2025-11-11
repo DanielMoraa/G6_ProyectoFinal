@@ -7,7 +7,7 @@ namespace ASECCC_Digital.Models
     {
         public override void OnActionExecuting(ActionExecutingContext context)
         {
-            if (context.HttpContext.Session.GetInt32("perfilId") == null)
+            if (context.HttpContext.Session.GetInt32("UsuarioId") == null)
             {
                 context.Result = new RedirectToActionResult("Login", "Home", null);
             }

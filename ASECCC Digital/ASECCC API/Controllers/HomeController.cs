@@ -56,7 +56,7 @@ namespace ASECCC_API.Controllers
             using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
             {
                 var parametros = new DynamicParameters();
-                parametros.Add("@CorreoElectronico", usuario.CorreoElectronico);
+                parametros.Add("@Identificacion", usuario.Identificacion);
                 parametros.Add("@Contrasena", usuario.Contrasena);
 
                 var resultado = context.QueryFirstOrDefault<DatosUsuarioResponseModel>("ValidarSesion", parametros);
@@ -64,7 +64,7 @@ namespace ASECCC_API.Controllers
                 if (resultado != null)
                 {
                     //JWT
-                    resultado.Token = GenerarToken(resultado.UsuarioId, resultado.Nombre, resultado.ConsecutivoPerfil);
+                    resultado.Token = GenerarToken(resultado.UsuarioId, resultado.NombreCompleto, resultado.PerfilId);
                     return Ok(resultado);
                 }
 
@@ -99,7 +99,7 @@ namespace ASECCC_API.Controllers
                         var ruta = Path.Combine(_environment.ContentRootPath, "PlantillaCorreo.html");
                         var html = System.IO.File.ReadAllText(ruta, UTF8Encoding.UTF8);
 
-                        html = html.Replace("{{Nombre}}", resultado.Nombre);
+                        html = html.Replace("{{NombreCompleto}}", resultado.NombreCompleto);
                         html = html.Replace("{{Contrasena}}", ContrasennaGenerada);
 
                         EnviarCorreo("Recuperar Acceso", html, resultado.CorreoElectronico);
