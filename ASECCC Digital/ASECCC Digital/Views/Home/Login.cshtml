@@ -13,52 +13,61 @@
     <div class="auth-wrapper v3">
         <div class="auth-form">
             <div class="auth-header">
-                <a asp-controller="Usuario" asp-action="Registro"><img src="~/lib/img/ASECCC_LOGO3.1.png" alt="Logo"></a>
+                <a asp-controller="Home" asp-action="Registro"><img src="~/lib/img/ASECCC_LOGO3.1.png" alt="Logo"></a>
             </div>
             <div class="card my-5">
                 <div class="card-body">
+
+                    @if (ViewBag.Mensaje != null)
+                    {
+                        <div class="alert alert-primary text-center">
+                            @ViewBag.Mensaje
+                        </div>
+                    }
+
+
                     <div class="d-flex justify-content-between align-items-end mb-4">
                         <h3 class="mb-0"><b>Iniciar Sesión</b></h3>
-                        <a asp-controller="Usuario" asp-action="Registro">¿No tiene una cuenta?</a>
+                        <a asp-controller="Home" asp-action="Registro">¿No tiene una cuenta?</a>
                     </div>
 
-                    <form asp-action="Login" asp-controller="Usuarios" method="POST" id="loginForm">
+                    <form id="FormInicioSesion" class="mb-3" asp-action="Login" asp-controller="Home">
+
                         <div class="form-group mb-3">
-                            <label class="form-label">Tipo de Identificación</label>
-                            <select class="form-control" name="tipoIdentificacion" id="tipoIdentificacion">
+                            <label asp-for="TipoIdentificacion" class="form-label">Tipo de Identificación</label>
+                            <select class="form-control" asp-for="TipoIdentificacion" id="tipoIdentificacion">
                                 <option value="Cedula">Cédula Nacional</option>
                                 <option value="DIMEX">Identificación DIMEX</option>
                             </select>
                         </div>
 
                         <div class="form-group mb-3">
-                            <label class="form-label">Número de Identificación</label>
-                            <input type="text" class="form-control" name="Identificacion" id="Identificacion"
+                            <label asp-for="Identificacion" class="form-label">Número de Identificación</label>
+                            <input type="text" class="form-control" asp-for="Identificacion" id="Identificacion"
                                    placeholder="Ingrese su número de identificación" maxlength="12" />
                         </div>
 
                         <div class="form-group mb-3">
-                            <label class="form-label">Contraseña</label>
+                            <label asp-for="Contrasena" class="form-label">Contraseña</label>
                             <div class="input-group">
-                                <input type="password" class="form-control" name="Contrasenna" id="Contrasenna"
+                                <input type="password" class="form-control" asp-for="Contrasena" id="Contrasenna"
                                        placeholder="Contraseña" />
                             </div>
                         </div>
 
                         <div class="d-flex mt-1 justify-content-between">
-                            <div class="form-check">
-
-                            </div>
+                            <div class="form-check"></div>
                             <a asp-controller="Usuario" asp-action="RecuperarAcceso" class="text-secondary">¿Olvidó su contraseña?</a>
                         </div>
 
                         <div class="d-grid mt-4">
                             <button type="submit" class="btn btn-primary">Iniciar Sesión</button>
                         </div>
-                    </form>
 
+                    </form>
                 </div>
             </div>
+
             <div class="auth-footer row">
                 <div class="col my-1">
                     <p class="m-0">© <a href="#">ASECCC Digital </a> @DateTime.Now.Year </p>
@@ -71,6 +80,9 @@
                     </ul>
                 </div>
             </div>
+
         </div>
     </div>
 </div>
+
+<script src="~/js/Login.js" asp-append-version="true"></script>

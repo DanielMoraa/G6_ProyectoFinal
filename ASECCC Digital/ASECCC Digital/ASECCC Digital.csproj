@@ -8,8 +8,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Folder Include="Views\Usuario\" />
     <Folder Include="wwwroot\lib\css\" />
-    <Folder Include="wwwroot\lib\js\" />
   </ItemGroup>
 
 </Project>

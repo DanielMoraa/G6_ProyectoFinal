@@ -1,6 +1,6 @@
-﻿namespace ASECCC_Digital.Models
+﻿namespace ASECCC_API.Models
 {
-    public class UsuarioModel
+    public class DatosUsuarioResponseModel
     {
         public int UsuarioId { get; set; }
         public string NombreCompleto { get; set; } = string.Empty;
@@ -17,9 +17,6 @@
         public int PerfilId { get; set; }
         public bool Estado { get; set; }
         public string NombrePerfil { get; set; } = string.Empty;
-        public string ContrasenaConfirmar { get; set; } = string.Empty;
         public string Token { get; set; } = string.Empty;
-
     }
 }
-

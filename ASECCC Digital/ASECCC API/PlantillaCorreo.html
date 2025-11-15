@@ -1,0 +1,203 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recuperación de acceso</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #004aad, #0066cc);
+            color: white;
+            padding: 25px 30px;
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .title {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .greeting {
+            font-size: 16px;
+            margin-bottom: 20px;
+            color: #444;
+        }
+
+        .message {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            border-left: 4px solid #0066cc;
+        }
+
+        .password-container {
+            background: #f0f7ff;
+            border: 1px dashed #0066cc;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .password-label {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .password {
+            font-size: 20px;
+            font-weight: bold;
+            color: #004aad;
+            letter-spacing: 1px;
+            padding: 10px;
+            background: white;
+            border-radius: 6px;
+            display: inline-block;
+            min-width: 200px;
+        }
+
+        .warning {
+            background-color: #fff8e6;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 20px 0;
+            font-size: 14px;
+        }
+
+        .warning-icon {
+            color: #ff9800;
+            margin-right: 8px;
+        }
+
+        .button-container {
+            text-align: center;
+            margin: 25px 0;
+        }
+
+        .button {
+            display: inline-block;
+            background: linear-gradient(135deg, #004aad, #0066cc);
+            color: white;
+            text-decoration: none;
+            padding: 12px 30px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 106, 204, 0.2);
+        }
+
+            .button:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 15px rgba(0, 106, 204, 0.3);
+            }
+
+        .footer {
+            background-color: #f8f9fa;
+            padding: 20px 30px;
+            text-align: center;
+            font-size: 12px;
+            color: #777;
+            border-top: 1px solid #eaeaea;
+        }
+
+        .contact-info {
+            margin-top: 10px;
+            font-size: 11px;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                border-radius: 0;
+            }
+
+            .header, .content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">ASECCC Digital</div>
+            <div class="title">Recuperación de acceso</div>
+            <div class="subtitle">Hemos recibido una solicitud de recuperación de contraseña</div>
+        </div>
+
+        <div class="content">
+            <p class="greeting">Estimado(a) {{NombreCompleto}},</p>
+
+            <div class="message">
+                <p>Hemos recibido una solicitud para recuperar el acceso a su cuenta. A continuación, encontrará su nueva contraseña temporal:</p>
+            </div>
+
+            <div class="password-container">
+                <div class="password-label">Su nueva contraseña temporal es:</div>
+                <div class="password">{{Contrasena}}</div>
+            </div>
+
+            <div class="warning">
+                <span class="warning-icon">⚠</span>
+                Por su seguridad, le recomendamos cambiar esta contraseña temporal inmediatamente después de acceder al sistema.
+            </div>
+
+            <div class="button-container">
+                <a href="#" class="button">Acceder al sistema</a>
+            </div>
+
+            <p>Si no realizó esta solicitud, por favor ignore este mensaje o póngase en contacto con nuestro equipo de soporte.</p>
+        </div>
+
+        <div class="footer">
+            &copy; 2025 ASECCC Digital. Todos los derechos reservados.
+            <div class="contact-info">
+                Para asistencia, contacte a: soporte@juevesnoche.com
+            </div>
+        </div>
+    </div>
+</body>
+</html>
