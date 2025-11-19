@@ -2,6 +2,7 @@
 using Dapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
+using System.Data;
 
 namespace ASECCC_API.Controllers
 {
@@ -63,6 +64,44 @@ namespace ASECCC_API.Controllers
                 parametros.Add("Contrasena", usuario.Contrasena);
 
                 var resultado = context.Execute("ActualizarContrasena", parametros);
+                return Ok(resultado);
+            }
+        }
+
+        [HttpPost]
+        [Route("BuscarAsociado")]
+        public IActionResult BuscarAsociado(BuscarAsociadoRequestModel usuario)
+        {
+            using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
+            {
+                var parametros = new DynamicParameters();
+                parametros.Add("BuscarNombre", usuario.BuscarNombre);
+
+                var resultado = context.QueryFirstOrDefault<BuscarAsociadoResponseModel>(
+                    "BuscarAsociadoPorNombre",
+                    parametros,
+                    commandType: System.Data.CommandType.StoredProcedure
+                );
+
+                return Ok(resultado);
+            }
+        }
+
+        [HttpPost]
+        [Route("DesactivarAsociado")]
+        public IActionResult DesactivarAsociado(DesactivarAsociadoRequestModel usuario)
+        {
+            using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
+            {
+                var parametros = new DynamicParameters();
+                parametros.Add("UsuarioId", usuario.UsuarioId);
+
+                var resultado = context.QueryFirstOrDefault<int>(
+                    "DesactivarAsociado",
+                    parametros,
+                    commandType: CommandType.StoredProcedure
+                );
+
                 return Ok(resultado);
             }
         }
