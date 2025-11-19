@@ -105,5 +105,58 @@ namespace ASECCC_API.Controllers
                 return Ok(resultado);
             }
         }
+
+        [HttpPost]
+        [Route("ObtenerRubrosLiquidacion")]
+        public IActionResult ObtenerRubrosLiquidacion(BuscarAsociadoLiquidacionRequestModel usuario)
+        {
+            using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
+            {
+                var parametros = new DynamicParameters();
+                parametros.Add("BuscarNombre", usuario.BuscarNombre);
+
+                var resultado = context.QueryFirstOrDefault<ObtenerRubrosLiquidacionResponseModel>(
+                    "ObtenerRubrosParaLiquidacion",
+                    parametros,
+                    commandType: System.Data.CommandType.StoredProcedure
+                );
+
+                if (resultado == null)
+                {
+                    return Ok(new ObtenerRubrosLiquidacionResponseModel());
+                }
+                var rubros = context.Query<RubroLiquidacionResponseModel>(
+                    "ObtenerDetalleRubrosLiquidacion",
+                    new { UsuarioId = resultado.UsuarioId },
+                    commandType: System.Data.CommandType.StoredProcedure
+                ).ToList();
+
+                resultado.Rubros = rubros;
+
+                return Ok(resultado);
+            }
+        }
+
+        [HttpPost]
+        [Route("LiquidarRubro")]
+        public IActionResult LiquidarRubro(LiquidarRubroRequestModel usuario)
+        {
+            using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
+            {
+                var parametros = new DynamicParameters();
+                parametros.Add("UsuarioId", usuario.UsuarioId);
+                parametros.Add("TipoRubro", usuario.TipoRubro);
+                parametros.Add("IdRubro", usuario.IdRubro);
+
+                var resultado = context.QueryFirstOrDefault<int>(
+                    "LiquidarRubroAsociado",
+                    parametros,
+                    commandType: CommandType.StoredProcedure
+                );
+
+                // Retornar un objeto JSON en lugar de un int directo
+                return Ok(new { filasAfectadas = resultado });
+            }
+        }
     }
 }
