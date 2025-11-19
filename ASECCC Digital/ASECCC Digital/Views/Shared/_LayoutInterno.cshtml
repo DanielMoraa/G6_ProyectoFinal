@@ -24,8 +24,6 @@
 </head>
 
 <body data-pc-preset="preset-1" data-pc-direction="ltr" data-pc-theme="light">
-
-    @RenderBody()
   <!-- [ Pre-loader ] start -->
 <div class="loader-bg">
   <div class="loader-track">
@@ -166,65 +164,25 @@
               ><i class="ti ti-user"></i> Profile</button
             >
           </li>
-          <li class="nav-item" role="presentation">
-            <button
-              class="nav-link"
-              id="drp-t2"
-              data-bs-toggle="tab"
-              data-bs-target="#drp-tab-2"
-              type="button"
-              role="tab"
-              aria-controls="drp-tab-2"
-              aria-selected="false"
-              ><i class="ti ti-settings"></i> Setting</button
-            >
-          </li>
+
         </ul>
         <div class="tab-content" id="mysrpTabContent">
           <div class="tab-pane fade show active" id="drp-tab-1" role="tabpanel" aria-labelledby="drp-t1" tabindex="0">
-            <a href="#!" class="dropdown-item">
+            <a asp-action="EditarPerfil" asp-controller="Usuario" class="dropdown-item">
               <i class="ti ti-edit-circle"></i>
-              <span>Edit Profile</span>
+              <span>Editar Perfil</span>
             </a>
-            <a href="#!" class="dropdown-item">
-              <i class="ti ti-user"></i>
-              <span>View Profile</span>
+
+            <a asp-action="Seguridad" asp-controller="Usuario" class="dropdown-item">
+              <i class="ti ti-settings"></i>
+              <span>Seguridad</span>
             </a>
-            <a href="#!" class="dropdown-item">
-              <i class="ti ti-clipboard-list"></i>
-              <span>Social Profile</span>
-            </a>
-            <a href="#!" class="dropdown-item">
-              <i class="ti ti-wallet"></i>
-              <span>Billing</span>
-            </a>
+
             <a href="#!" class="dropdown-item">
               <i class="ti ti-power"></i>
-              <span>Logout</span>
+              <span>Cerrar Sesión</span>
             </a>
-          </div>
-          <div class="tab-pane fade" id="drp-tab-2" role="tabpanel" aria-labelledby="drp-t2" tabindex="0">
-            <a href="#!" class="dropdown-item">
-              <i class="ti ti-help"></i>
-              <span>Support</span>
-            </a>
-            <a href="#!" class="dropdown-item">
-              <i class="ti ti-user"></i>
-              <span>Account Settings</span>
-            </a>
-            <a href="#!" class="dropdown-item">
-              <i class="ti ti-lock"></i>
-              <span>Privacy Center</span>
-            </a>
-            <a href="#!" class="dropdown-item">
-              <i class="ti ti-messages"></i>
-              <span>Feedback</span>
-            </a>
-            <a href="#!" class="dropdown-item">
-              <i class="ti ti-list"></i>
-              <span>History</span>
-            </a>
-          </div>
+          </div>     
         </div>
       </div>
     </li>
@@ -234,26 +192,9 @@
 <!-- [ Header ] end -->
     <!-- [ Main Content ] start -->
     <div class="pc-container">
+        @RenderBody()
         <div class="pc-content">
-            <!-- [ breadcrumb ] start -->
-            <div class="page-header">
-                <div class="page-block">
-                    <div class="row align-items-center">
-                        <div class="col-md-12">
-                            <div class="page-header-title">
-                                <h5 class="m-b-10">Principal</h5>
-                            </div>
-                            <ul class="breadcrumb">
-                                <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Principal">Home</a></li>
-                                <li class="breadcrumb-item" aria-current="page">Principal</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- [ breadcrumb ] end -->
-            <!-- [ Main Content ] start -->
-            <!-- [ Main Content ] end -->
+
         </div>
     </div>
     <!-- [ Main Content ] end -->

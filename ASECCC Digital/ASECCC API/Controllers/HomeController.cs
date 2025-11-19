@@ -174,7 +174,7 @@ namespace ASECCC_API.Controllers
 
             var token = new JwtSecurityToken(
                 claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(1),
+                expires: DateTime.UtcNow.AddMinutes(40),
                 signingCredentials: credentials
             );
 

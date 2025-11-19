@@ -1,0 +1,79 @@
+﻿@model UsuarioModel
+
+@{
+    Layout = "_LayoutInterno";
+}
+
+<div class="card mb-4 mt-4">
+
+    @if (ViewBag.Mensaje != null)
+    {
+        <div class="alert alert-primary text-center">
+            @ViewBag.Mensaje
+        </div>
+    }
+
+    <h4 class="card-header text-center">Perfil</h4>
+    <div class="card-body">
+
+        <div class="row">
+            <div class="col-md-1"></div>
+            <div class="col-md-10">
+
+                <form id="FormPerfil" asp-action="EditarPerfil" asp-controller="Usuario">
+                    <div class="form-group mb-3">
+                        <label class="form-label">Nombre</label>
+                        <input type="text" class="form-control" asp-for="NombreCompleto" readonly />
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label class="form-label">Correo Electrónico</label>
+                        <input type="email" class="form-control" asp-for="CorreoElectronico" />
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label class="form-label">Tipo de identificación</label>
+                        <select class="form-control" asp-for="TipoIdentificacion">
+                            <option value="">Seleccione un tipo</option>
+                            <option value="Nacional">Nacional</option>
+                            <option value="DIMEX">DIMEX</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label class="form-label">Identificación</label>
+                        <input type="text" class="form-control" asp-for="Identificacion" onkeyup="ConsultarNombre()" />
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label class="form-label">Fecha Nacimiento</label>
+                        <input type="date" class="form-control" asp-for="FechaNacimiento">
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label class="form-label">Teléfono</label>
+                        <input type="text" class="form-control" asp-for="Telefono" />
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label class="form-label">Dirección</label>
+                        <input type="text" class="form-control" asp-for="Direccion" />
+                    </div>
+
+                    <div class="mb-3 form-password-toggle">
+                        <label class="form-label">Perfil</label>
+                        <input type="text" class="form-control" asp-for="NombrePerfil" readonly="readonly" />
+                    </div>
+
+                    <div class="d-grid mt-4">
+                        <button type="submit" class="btn btn-primary">Procesar</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script src="~/js/Perfil.js" asp-append-version="true"></script>
