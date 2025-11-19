@@ -1,0 +1,53 @@
+﻿@model UsuarioModel
+@{
+    Layout = "_LayoutInterno";
+}
+<div class="card mb-4 mt-4">
+    @if (ViewBag.Mensaje != null)
+    {
+        <div class="alert alert-primary text-center">
+            @ViewBag.Mensaje
+        </div>
+    }
+    <h4 class="card-header text-center">Buscar y Desactivar Asociado</h4>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-1"></div>
+            <div class="col-md-10">
+                <form id="FormBuscarAsociado">
+                    <div class="form-group mb-3">
+                        <label class="form-label">Buscar por Nombre</label>
+                        <input type="text"
+                               id="buscarNombre"
+                               class="form-control"
+                               placeholder="Ingrese el nombre del asociado"
+                               required />
+                    </div>
+                    <div class="d-grid mt-3">
+                        <button type="button" class="btn btn-primary" onclick="buscarAsociado()">Buscar</button>
+                    </div>
+                </form>
+                <div id="resultadosBusqueda" class="table-responsive mt-4" style="display:none;">
+                    <h5 class="text-center">Resultados de la Búsqueda</h5>
+                    <table class="table table-bordered mt-3">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Nombre Completo</th>
+                                <th>Identificación</th>
+                                <th>Correo</th>
+                                <th>Teléfono</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaResultados"></tbody>
+                    </table>
+                </div>
+                <div id="sinResultados" class="text-center mt-3" style="display:none;">
+                    <p class="text-danger fw-bold">No se encontraron asociados.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/js/Asociados.js" asp-append-version="true"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
