@@ -43,33 +43,38 @@
     <div class="navbar-content">
       <ul class="pc-navbar">
         <li class="pc-item">
-            <a href="" class="pc-link">
+         <a asp-action="Principal" asp-controller="Home" class="pc-link">
             <span class="pc-micon"><i class="ti ti-dashboard"></i></span>
-            <span class="pc-mtext">Dashboard</span>
+            <span class="pc-mtext">Principal</span>
           </a>
         </li>
 
-        
 
-        <li class="pc-item pc-caption">
-          <label>Pages</label>
-          <i class="ti ti-news"></i>
-        </li>
-        <li class="pc-item">
-          <a asp-controller="Usuario" asp-action="BuscarDesactivarAsociado" class="pc-link">
-            <span class="pc-micon"><i class="ti ti-lock"></i></span>
-            <span class="pc-mtext">Buscar y desactivar Asociado</span>
-          </a>
-        </li>
-        <li class="pc-item">
-          <a asp-controller="Usuario" asp-action="LiquidarAsociado" class="pc-link">
-            <span class="pc-micon"><i class="ti ti-user-plus"></i></span>
-            <span class="pc-mtext">Liquidar Asociado</span>
-          </a>
-        </li>
-
-        
-      </ul>
+                    <li class="pc-item pc-hasmenu">
+                        <a href="#!" class="pc-link">
+                            <span class="pc-micon"><i class="ti ti-menu"></i></span><span class="pc-mtext">
+                                Asociados
+                            </span><span class="pc-arrow"><i data-feather="chevron-right"></i></span>
+                        </a>
+                        <ul class="pc-submenu">
+                            <li class="pc-item pc-caption">
+                                <label>Pages</label>
+                                <i class="ti ti-news"></i>
+                            </li>
+                            <li class="pc-item">
+                                <a asp-controller="Usuario" asp-action="BuscarDesactivarAsociado" class="pc-link">
+                                    <span class="pc-micon"><i class="ti ti-search"></i></span>
+                                    <span class="pc-mtext">Buscar y desactivar Asociado</span>
+                                </a>
+                            </li>
+                            <li class="pc-item">
+                                <a asp-controller="Usuario" asp-action="LiquidarAsociado" class="pc-link">
+                                    <span class="pc-micon"><i class="ti ti-report-money"></i></span>
+                                    <span class="pc-mtext">Liquidar Asociado</span>
+                                </a>
+                            </li>
+                            
+                        </ul>
       
     </div>
   </div>
@@ -110,12 +115,7 @@
         </form>
       </div>
     </li>
-    <li class="pc-h-item d-none d-md-inline-flex">
-      <form class="header-search">
-        <i data-feather="search" class="icon-search"></i>
-        <input type="search" class="form-control" placeholder="Search here. . .">
-      </form>
-    </li>
+
   </ul>
 </div>
 <!-- [Mobile Media Block end] -->
@@ -147,7 +147,7 @@
                                     <span>@nombrePerfil</span>
                                 </div>
 
-            <a href="#!" class="pc-head-link bg-transparent"><i class="ti ti-power text-danger"></i></a>
+                                <a asp-action="CerrarSesion" asp-controller="Home" class="pc-head-link bg-transparent"><i class="ti ti-power text-danger"></i></a>
           </div>
         </div>
         <ul class="nav drp-tabs nav-fill nav-tabs" id="mydrpTab" role="tablist">
@@ -178,7 +178,7 @@
               <span>Seguridad</span>
             </a>
 
-            <a href="#!" class="dropdown-item">
+           <a asp-action="CerrarSesion" asp-controller="Home" class="dropdown-item">
               <i class="ti ti-power"></i>
               <span>Cerrar Sesión</span>
             </a>
@@ -192,9 +192,8 @@
 <!-- [ Header ] end -->
     <!-- [ Main Content ] start -->
     <div class="pc-container">
-        @RenderBody()
         <div class="pc-content">
-
+            @RenderBody()
         </div>
     </div>
     <!-- [ Main Content ] end -->

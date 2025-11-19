@@ -126,7 +126,7 @@ namespace ASECCC_Digital.Controllers
         public IActionResult CerrarSesion()
         {
             HttpContext.Session.Clear();
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Login", "Home");
         }
     }
 }
