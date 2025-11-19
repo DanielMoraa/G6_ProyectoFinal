@@ -1,0 +1,65 @@
+﻿@model UsuarioModel
+@{
+    Layout = "_LayoutInterno";
+}
+
+<div class="card mb-4 mt-4">
+    @if (ViewBag.Mensaje != null)
+    {
+        <div class="alert alert-primary text-center">
+            @ViewBag.Mensaje
+        </div>
+    }
+
+    <h4 class="card-header text-center">Liquidar Asociado</h4>
+
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-1"></div>
+            <div class="col-md-10">
+
+                <form id="FormBuscarAsociado">
+                    <div class="form-group mb-3">
+                        <label class="form-label">Buscar Asociado</label>
+                        <input type="text"
+                               id="buscarAsociado"
+                               class="form-control"
+                               placeholder="Ingrese el nombre del asociado"
+                               required />
+                    </div>
+                    <div class="d-grid mt-3">
+                        <button type="button" class="btn btn-primary" onclick="buscarAsociadoLiquidacion()">
+                            Buscar
+                        </button>
+                    </div>
+                </form>
+
+                <div id="detalleCuenta" style="display: none;" class="mt-4">
+                    <h5 class="text-center mb-3">Rubros Activos del Asociado</h5>
+                    <p class="text-center"><strong id="nombreAsociado"></strong></p>
+
+                    <div class="table-responsive">
+                        <table class="table table-bordered mt-3">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Tipo</th>
+                                    <th>Descripción</th>
+                                    <th>Saldo</th>
+                                    <th>Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablaRubros"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div id="sinRubros" class="text-center mt-3" style="display:none;">
+                    <p class="text-warning fw-bold">No se encontraron rubros activos para este asociado.</p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/js/Liquidacion.js" asp-append-version="true"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

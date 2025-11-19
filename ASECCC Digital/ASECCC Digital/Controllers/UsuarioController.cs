@@ -166,6 +166,81 @@ namespace ASECCC_Digital.Controllers
             }
         }
 
+        [HttpGet]
+        public IActionResult LiquidarAsociado()
+        {
+            return View();
+        }
 
+        [HttpPost]
+        public IActionResult ObtenerRubrosLiquidacion([FromBody] UsuarioModel usuario)
+        {
+            using (var client = _http.CreateClient())
+            {
+                var url = _configuration["Valores:UrlAPI"] + "Usuario/ObtenerRubrosLiquidacion";
+                client.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("Token"));
+
+                var payload = new
+                {
+                    BuscarNombre = usuario.NombreCompleto
+                };
+
+                var respuesta = client.PostAsJsonAsync(url, payload).Result;
+
+                if (!respuesta.IsSuccessStatusCode)
+                    return Json(new { success = false, message = "Error al comunicarse con el servidor" });
+
+                var datos = respuesta.Content.ReadFromJsonAsync<RubrosLiquidacionModel>().Result;
+
+                if (datos == null || datos.UsuarioId == 0)
+                    return Json(new { success = false, message = "Asociado no encontrado" });
+
+                return Json(new
+                {
+                    success = true,
+                    usuarioId = datos.UsuarioId,
+                    nombreCompleto = datos.NombreCompleto,
+                    rubros = datos.Rubros
+                });
+            }
+        }
+
+        [HttpPost]
+        public IActionResult LiquidarRubro([FromBody] LiquidarRubroModel liquidacion)
+        {
+            using (var client = _http.CreateClient())
+            {
+                var url = _configuration["Valores:UrlAPI"] + "Usuario/LiquidarRubro";
+                client.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("Token"));
+
+                var payload = new
+                {
+                    liquidacion.UsuarioId,
+                    liquidacion.TipoRubro,
+                    liquidacion.IdRubro
+                };
+
+                var respuesta = client.PostAsJsonAsync(url, payload).Result;
+
+                if (!respuesta.IsSuccessStatusCode)
+                    return Json(new { success = false, message = "Error al comunicarse con el servidor" });
+
+                // Leer como string primero para debug
+                var jsonString = respuesta.Content.ReadAsStringAsync().Result;
+
+                // Deserializar usando System.Text.Json
+                using var doc = System.Text.Json.JsonDocument.Parse(jsonString);
+                var filasAfectadas = doc.RootElement.GetProperty("filasAfectadas").GetInt32();
+
+                if (filasAfectadas > 0)
+                {
+                    return Json(new { success = true, message = "Rubro liquidado correctamente" });
+                }
+
+                return Json(new { success = false, message = "No se pudo liquidar el rubro" });
+            }
+        }
     }
 }
