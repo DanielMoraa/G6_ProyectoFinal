@@ -59,25 +59,31 @@ namespace ASECCC_Digital.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> RegistroAsync(UsuarioModel usuario)
+        public async Task<IActionResult> RegistroAsync([FromBody] UsuarioModel usuario)
         {
-            using (var context = _http.CreateClient())
+            try
             {
-                var urlApi = _configuration["Valores:UrlAPI"] + "Home/Registro";
-                var respuesta = context.PostAsJsonAsync(urlApi, usuario).Result;
-                var contenido = await respuesta.Content.ReadAsStringAsync();
-                Console.WriteLine(contenido);
-
-                if (respuesta.IsSuccessStatusCode)
+                using (var context = _http.CreateClient())
                 {
-                    var datosApi = respuesta.Content.ReadFromJsonAsync<int>().Result;
-
-                    if (datosApi > 0)
-                        return RedirectToAction("Login", "Home");
+                    var urlApi = _configuration["Valores:UrlAPI"] + "Home/Registro";
+                    var respuesta = await context.PostAsJsonAsync(urlApi, usuario);
+                    var contenido = await respuesta.Content.ReadAsStringAsync();
+                    Console.WriteLine(contenido);
+                    if (respuesta.IsSuccessStatusCode)
+                    {
+                        var datosApi = await respuesta.Content.ReadFromJsonAsync<int>();
+                        if (datosApi > 0)
+                        {
+                            return Json(new { success = true, message = "Registro exitoso" });
+                        }
+                    }
+                    return Json(new { success = false, message = "No se ha registrado la información" });
                 }
-
-                ViewBag.Mensaje = "No se ha registrado la información";
-                return View();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+                return Json(new { success = false, message = "Error al procesar la solicitud" });
             }
         }
 
@@ -104,7 +110,7 @@ namespace ASECCC_Digital.Controllers
                     var datosApi = respuesta.Content.ReadFromJsonAsync<UsuarioModel>().Result;
 
                     if (datosApi != null)
-                        return RedirectToAction("Index", "Home");
+                        return RedirectToAction("Login", "Home");
                 }
 
                 ViewBag.Mensaje = "No se ha recuperado el acceso";

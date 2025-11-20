@@ -22,6 +22,21 @@
                     </div>
 
                     <form id="FormRegistro" asp-action="Registro" asp-controller="Home">
+
+                        <div class="form-group mb-3">
+                            <label class="form-label">Tipo de identificación</label>
+                            <select class="form-control" asp-for="TipoIdentificacion">
+                                <option value="">Seleccione un tipo</option>
+                                <option value="Nacional">Nacional</option>
+                                <option value="DIMEX">DIMEX</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="form-label">Identificación</label>
+                            <input type="text" class="form-control" asp-for="Identificacion" onkeyup="ConsultarNombre()" />
+                        </div>
+
                         <div class="form-group mb-3">
                             <label class="form-label">Nombre</label>
                             <input type="text" class="form-control" asp-for="NombreCompleto" readonly />
@@ -37,20 +52,6 @@
                             <div class="input-group input-group-merge">
                                 <input type="password" class="form-control" asp-for="Contrasena" />
                             </div>
-                        </div>
-
-                        <div class="form-group mb-3">
-                            <label class="form-label">Tipo de identificación</label>
-                            <select class="form-control" asp-for="TipoIdentificacion">
-                                <option value="">Seleccione un tipo</option>
-                                <option value="Nacional">Nacional</option>
-                                <option value="DIMEX">DIMEX</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group mb-3">
-                            <label class="form-label">Identificación</label>
-                            <input type="text" class="form-control" asp-for="Identificacion" onkeyup="ConsultarNombre()" />
                         </div>
 
                         <div class="form-group mb-3">
@@ -92,7 +93,9 @@
 
 </div>
 
+
 <script src="~/js/Registro.js" asp-append-version="true"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 
 
