@@ -184,7 +184,7 @@ namespace ASECCC_Digital.Controllers
                     new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("Token"));
 
                 var payload = new { SolicitudPrestamoId = solicitudPrestamoId };
-                var respuesta = client.PutAsJsonAsync(url, payload).Result;
+                var respuesta = client.PostAsJsonAsync(url, payload).Result;
 
                 if (respuesta.IsSuccessStatusCode)
                 {

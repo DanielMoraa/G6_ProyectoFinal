@@ -10,8 +10,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
     <title>ASECCC Digital</title>
-    <meta name="description" content="" />
+    <meta name="description" content="Sistema de Gestión ASECCC" />
     <link rel="icon" href="~/lib/img/ASECCC_LOGO_2.png" type="image/x-icon">
+    
     @* Sección CSS *@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&display=swap" id="main-font-link">
     <link rel="stylesheet" href="~/lib/fonts/tabler-icons.min.css">
@@ -134,27 +135,9 @@
                     </a>
                 </li>
                 <li class="pc-item">
-                    <a asp-controller="Reportes" asp-action="HistorialTransacciones" class="pc-link">
-                        <span class="pc-micon"><i class="ti ti-history"></i></span>
-                        <span class="pc-mtext">Historial de Transacciones</span>
-                    </a>
-                </li>
-                <li class="pc-item">
                     <a asp-controller="Reportes" asp-action="EstadoCuenta" class="pc-link">
                         <span class="pc-micon"><i class="ti ti-file-text"></i></span>
                         <span class="pc-mtext">Estado de Cuenta</span>
-                    </a>
-                </li>
-                <li class="pc-item">
-                    <a asp-controller="Reportes" asp-action="ReportePrestamos" class="pc-link">
-                        <span class="pc-micon"><i class="ti ti-report"></i></span>
-                        <span class="pc-mtext">Reporte de Préstamos</span>
-                    </a>
-                </li>
-                <li class="pc-item">
-                    <a asp-controller="Reportes" asp-action="ReporteAhorros" class="pc-link">
-                        <span class="pc-micon"><i class="ti ti-piggy-bank"></i></span>
-                        <span class="pc-mtext">Reporte de Ahorros</span>
                     </a>
                 </li>
             </ul>
@@ -322,19 +305,25 @@
     </footer>
 
     @* Sección JS *@
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+            integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+            crossorigin="anonymous"></script>
     <script src="~/lib/js/popper.min.js"></script>
     <script src="~/lib/js/simplebar.min.js"></script>
     <script src="~/lib/js/bootstrap.min.js"></script>
     <script src="~/lib/js/custom-font.js"></script>
     <script src="~/lib/js/pcoded.js"></script>
     <script src="~/lib/js/feather.min.js"></script>
-    <script src="~/lib/js/jquery.min.js"></script>
     <script src="~/lib/js/comunes.js"></script>
-    <script>layout_change('light');</script>
-    <script>change_box_container('false');</script>
-    <script>layout_rtl_change('false');</script>
-    <script>preset_change("preset-1");</script>
-    <script>font_change("Public-Sans");</script>
-    @RenderSection("Scripts", required: false)
+    
+    <script>
+        layout_change('light');
+        change_box_container('false');
+        layout_rtl_change('false');
+        preset_change("preset-1");
+        font_change("Public-Sans");
+    </script>
+
+    @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

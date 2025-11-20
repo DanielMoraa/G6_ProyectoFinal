@@ -40,11 +40,6 @@ namespace ASECCC_Digital.Controllers
             }
         }
 
-        [HttpGet]
-        public IActionResult HistorialTransacciones()
-        {
-            return View();
-        }
 
         [HttpPost]
         public IActionResult ObtenerHistorialTransacciones(DateTime? fechaInicio, DateTime? fechaFin)
@@ -53,10 +48,13 @@ namespace ASECCC_Digital.Controllers
 
             using (var client = _http.CreateClient())
             {
-                var url = _configuration["Valores:UrlAPI"] + 
-                    $"Reportes/HistorialTransacciones?usuarioId={usuarioId}" +
-                    (fechaInicio.HasValue ? $"&fechaInicio={fechaInicio.Value:yyyy-MM-dd}" : "") +
-                    (fechaFin.HasValue ? $"&fechaFin={fechaFin.Value:yyyy-MM-dd}" : "");
+                var url = _configuration["Valores:UrlAPI"] +
+                    $"Reportes/HistorialTransacciones?usuarioId={usuarioId}";
+
+                if (fechaInicio.HasValue)
+                    url += $"&fechaInicio={fechaInicio.Value:yyyy-MM-dd}";
+                if (fechaFin.HasValue)
+                    url += $"&fechaFin={fechaFin.Value:yyyy-MM-dd}";
 
                 client.DefaultRequestHeaders.Authorization =
                     new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("Token"));
@@ -108,11 +106,17 @@ namespace ASECCC_Digital.Controllers
         {
             using (var client = _http.CreateClient())
             {
-                var url = _configuration["Valores:UrlAPI"] + 
-                    $"Reportes/ReportePrestamos?" +
-                    (fechaInicio.HasValue ? $"fechaInicio={fechaInicio.Value:yyyy-MM-dd}&" : "") +
-                    (fechaFin.HasValue ? $"fechaFin={fechaFin.Value:yyyy-MM-dd}&" : "") +
-                    (!string.IsNullOrEmpty(estado) ? $"estado={estado}" : "");
+                var url = _configuration["Valores:UrlAPI"] + "Reportes/ReportePrestamos?";
+
+                var parametros = new List<string>();
+                if (fechaInicio.HasValue)
+                    parametros.Add($"fechaInicio={fechaInicio.Value:yyyy-MM-dd}");
+                if (fechaFin.HasValue)
+                    parametros.Add($"fechaFin={fechaFin.Value:yyyy-MM-dd}");
+                if (!string.IsNullOrEmpty(estado))
+                    parametros.Add($"estado={estado}");
+
+                url += string.Join("&", parametros);
 
                 client.DefaultRequestHeaders.Authorization =
                     new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("Token"));
@@ -140,10 +144,15 @@ namespace ASECCC_Digital.Controllers
         {
             using (var client = _http.CreateClient())
             {
-                var url = _configuration["Valores:UrlAPI"] + 
-                    $"Reportes/ReporteAhorros?" +
-                    (fechaInicio.HasValue ? $"fechaInicio={fechaInicio.Value:yyyy-MM-dd}&" : "") +
-                    (fechaFin.HasValue ? $"fechaFin={fechaFin.Value:yyyy-MM-dd}" : "");
+                var url = _configuration["Valores:UrlAPI"] + "Reportes/ReporteAhorros?";
+
+                var parametros = new List<string>();
+                if (fechaInicio.HasValue)
+                    parametros.Add($"fechaInicio={fechaInicio.Value:yyyy-MM-dd}");
+                if (fechaFin.HasValue)
+                    parametros.Add($"fechaFin={fechaFin.Value:yyyy-MM-dd}");
+
+                url += string.Join("&", parametros);
 
                 client.DefaultRequestHeaders.Authorization =
                     new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("Token"));

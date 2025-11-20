@@ -398,16 +398,129 @@ namespace ASECCC_API.Controllers
         {
             using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
             {
-                var parametros = new DynamicParameters();
-                parametros.Add("@SolicitudId", (int)request.SolicitudPrestamoId);
-                parametros.Add("@NuevoEstado", (string)request.NuevoEstado);
+                context.Open();
+                using (var transaction = context.BeginTransaction())
+                {
+                    try
+                    {
+                        // Si el nuevo estado es "Aprobada", crear el préstamo
+                        if (request.NuevoEstado == "Aprobada")
+                        {
+                            // 1. Obtener datos de la solicitud
+                            var parametrosSolicitud = new DynamicParameters();
+                            parametrosSolicitud.Add("@SolicitudId", request.SolicitudPrestamoId);
 
-                var query = @"UPDATE SolicitudesPrestamo 
-                     SET estadoSolicitud = @NuevoEstado
-                     WHERE solicitudPrestamoId = @SolicitudId";
+                            var querySolicitud = @"SELECT * FROM SolicitudesPrestamo 
+                                                  WHERE solicitudPrestamoId = @SolicitudId";
 
-                var resultado = context.Execute(query, parametros);
-                return Ok(resultado);
+                            var solicitudData = context.QueryFirstOrDefault<SolicitudPrestamoCompleta>(
+                                querySolicitud, parametrosSolicitud, transaction);
+
+                            if (solicitudData == null)
+                            {
+                                transaction.Rollback();
+                                return NotFound(new { success = false, message = "Solicitud no encontrada" });
+                            }
+
+                            // Verificar que no esté ya aprobada
+                            if (solicitudData.EstadoSolicitud == "Aprobada")
+                            {
+                                transaction.Rollback();
+                                return BadRequest(new { success = false, message = "La solicitud ya fue aprobada" });
+                            }
+
+                            // 2. Crear el préstamo
+                            var parametrosPrestamo = new DynamicParameters();
+                            parametrosPrestamo.Add("@UsuarioId", solicitudData.UsuarioId);
+                            parametrosPrestamo.Add("@MontoAprobado", solicitudData.MontoSolicitud);
+                            parametrosPrestamo.Add("@Plazo", solicitudData.PlazoMeses);
+                            parametrosPrestamo.Add("@CuotaSemanal", solicitudData.CuotaSemanalSolicitud);
+                            parametrosPrestamo.Add("@TipoPrestamo", solicitudData.TipoPrestamo);
+
+                            var queryPrestamo = @"INSERT INTO Prestamos 
+                                                 (usuarioId, montoAprobado, plazo, cuotaSemanal, tipoPrestamo, 
+                                                  estadoPrestamo, fechaSolicitud, fechaEstado, saldoPendiente)
+                                                 VALUES 
+                                                 (@UsuarioId, @MontoAprobado, @Plazo, @CuotaSemanal, @TipoPrestamo, 
+                                                  'Aprobado', GETDATE(), GETDATE(), @MontoAprobado);
+                                                 SELECT CAST(SCOPE_IDENTITY() as int)";
+
+                            var prestamoId = context.QuerySingle<int>(queryPrestamo, parametrosPrestamo, transaction);
+
+                            // 3. Actualizar estado de solicitud a "Aprobada"
+                            var parametrosActualizar = new DynamicParameters();
+                            parametrosActualizar.Add("@SolicitudId", request.SolicitudPrestamoId);
+                            parametrosActualizar.Add("@NuevoEstado", "Aprobada");
+
+                            var queryActualizar = @"UPDATE SolicitudesPrestamo 
+                                                   SET estadoSolicitud = @NuevoEstado,
+                                                       fechaAprobacion = GETDATE()
+                                                   WHERE solicitudPrestamoId = @SolicitudId";
+
+                            context.Execute(queryActualizar, parametrosActualizar, transaction);
+
+                            transaction.Commit();
+                            
+                            return Ok(new { 
+                                success = true, 
+                                message = "Préstamo aprobado y creado exitosamente",
+                                prestamoId = prestamoId,
+                                montoAprobado = solicitudData.MontoSolicitud
+                            });
+                        }
+                        else if (request.NuevoEstado == "Rechazada")
+                        {
+                            // Si es rechazo, solo actualizar el estado
+                            var parametrosRechazar = new DynamicParameters();
+                            parametrosRechazar.Add("@SolicitudId", request.SolicitudPrestamoId);
+                            parametrosRechazar.Add("@NuevoEstado", "Rechazada");
+
+                            var queryRechazar = @"UPDATE SolicitudesPrestamo 
+                                                 SET estadoSolicitud = @NuevoEstado,
+                                                     fechaRechazo = GETDATE()
+                                                 WHERE solicitudPrestamoId = @SolicitudId";
+
+                            var resultado = context.Execute(queryRechazar, parametrosRechazar, transaction);
+                            
+                            transaction.Commit();
+                            
+                            return Ok(new { 
+                                success = true, 
+                                message = "Solicitud rechazada correctamente",
+                                resultado 
+                            });
+                        }
+                        else
+                        {
+                            // Para cualquier otro estado (En Revisión, etc.)
+                            var parametros = new DynamicParameters();
+                            parametros.Add("@SolicitudId", request.SolicitudPrestamoId);
+                            parametros.Add("@NuevoEstado", request.NuevoEstado);
+
+                            var query = @"UPDATE SolicitudesPrestamo 
+                                         SET estadoSolicitud = @NuevoEstado
+                                         WHERE solicitudPrestamoId = @SolicitudId";
+
+                            var resultado = context.Execute(query, parametros, transaction);
+                            
+                            transaction.Commit();
+                            
+                            return Ok(new { 
+                                success = true, 
+                                message = $"Estado cambiado a {request.NuevoEstado}",
+                                resultado 
+                            });
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        transaction.Rollback();
+                        return BadRequest(new { 
+                            success = false, 
+                            message = $"Error al procesar la solicitud: {ex.Message}" 
+                        });
+                    }
+                }
             }
         }
     }
