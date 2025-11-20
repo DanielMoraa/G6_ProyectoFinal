@@ -1,0 +1,71 @@
+﻿@{
+    Layout = "_LayoutInterno";
+    ViewData["Title"] = "Notificaciones Admin";
+}
+
+@section PageHeader {
+    <div class="page-header">
+        <div class="page-block">
+            <div class="row align-items-center">
+                <div class="col-md-12">
+                    <div class="page-header-title">
+                        <h5 class="m-b-10">Notificaciones</h5>
+                    </div>
+                    <ul class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a asp-controller="Home" asp-action="Principal">Home</a>
+                        </li>
+                        <li class="breadcrumb-item" aria-current="page">Notificaciones</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<div class="row mb-3">
+    <div class="col-md-12 text-end">
+        <a asp-controller="Notificaciones" asp-action="Crear" class="btn btn-primary">
+            <i class="ti ti-plus"></i> Nueva Notificación
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card shadow-sm">
+            <div class="card-body">
+
+                <table class="table table-striped align-middle">
+                    <thead>
+                        <tr>
+                            <th>Título</th>
+                            <th>Enviada a</th>
+                            <th>Fecha</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Recordatorio de aporte</td>
+                            <td>Usuarios activos</td>
+                            <td>10/11/2025</td>
+                        </tr>
+
+                        <tr>
+                            <td>Aviso general</td>
+                            <td>Todos los asociados</td>
+                            <td>03/11/2025</td>
+                        </tr>
+
+                        <tr>
+                            <td>Actualización de plataforma</td>
+                            <td>Administradores</td>
+                            <td>01/11/2025</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+    </div>
+</div>

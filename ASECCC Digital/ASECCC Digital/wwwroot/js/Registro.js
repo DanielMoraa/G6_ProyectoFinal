@@ -25,7 +25,6 @@
         input.classList.remove("is-invalid");
     }
 
-    // No permitir escribir identificacion sin seleccionar tipo
     identificacion.addEventListener("input", function () {
         if (!tipoIdentificacion.value) {
             identificacion.value = "";
@@ -35,7 +34,6 @@
         }
     });
 
-    // Formato de cédula x-xxxx-xxxx
     identificacion.addEventListener("keyup", function () {
         let valor = identificacion.value.replace(/\D/g, "");
 
@@ -56,6 +54,7 @@
     });
 
     form.addEventListener("submit", function (e) {
+        e.preventDefault();
         let valido = true;
 
         clearError(correo);
@@ -64,26 +63,13 @@
         clearError(fechaNacimiento);
         clearError(telefono);
         clearError(direccion);
+        clearError(tipoIdentificacion);
 
-        // Correo
-        if (!correo.value.includes("@")) {
-            setError(correo, "El correo debe contener '@'.");
-            valido = false;
-        }
-
-        // Contraseña
-        if (contrasena.value.length < 6) {
-            setError(contrasena, "La contraseña debe tener al menos 6 caracteres.");
-            valido = false;
-        }
-
-        // Tipo identificación seleccionado
         if (!tipoIdentificacion.value) {
             setError(tipoIdentificacion, "Seleccione el tipo de identificación.");
             valido = false;
         }
 
-        // Validar cédula
         let cedulaLimpia = identificacion.value.replace(/\D/g, "");
 
         if (tipoIdentificacion.value === "Nacional" && cedulaLimpia.length !== 9) {
@@ -96,25 +82,76 @@
             valido = false;
         }
 
-        // Fecha nacimiento
+        if (!correo.value.includes("@")) {
+            setError(correo, "El correo debe contener '@'.");
+            valido = false;
+        }
+
+        if (contrasena.value.length < 6) {
+            setError(contrasena, "La contraseña debe tener al menos 6 caracteres.");
+            valido = false;
+        }
+
         if (!fechaNacimiento.value) {
             setError(fechaNacimiento, "Debe seleccionar su fecha de nacimiento.");
             valido = false;
         }
 
-        // Teléfono
         if (!/^\d{8}$/.test(telefono.value)) {
             setError(telefono, "El teléfono debe ser numérico y contener 8 dígitos.");
             valido = false;
         }
 
-        // Dirección
         if (direccion.value.trim() === "") {
             setError(direccion, "La dirección es obligatoria.");
             valido = false;
         }
 
-        if (!valido) e.preventDefault();
+        if (!valido) {
+            Swal.fire("Atención", "Por favor corrija los errores en el formulario.", "warning");
+            return;
+        }
+
+        registrarUsuario();
     });
+
+    function registrarUsuario() {
+        const formData = {
+            TipoIdentificacion: tipoIdentificacion.value,
+            Identificacion: identificacion.value,
+            NombreCompleto: nombreCompleto.value,
+            CorreoElectronico: correo.value,
+            Contrasena: contrasena.value,
+            FechaNacimiento: fechaNacimiento.value,
+            Telefono: telefono.value,
+            Direccion: direccion.value
+        };
+
+        fetch("/Home/Registro", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(formData)
+        })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        title: "Éxito",
+                        text: "Registro completado correctamente",
+                        icon: "success",
+                        confirmButtonText: "Aceptar"
+                    }).then(() => {
+                        // Redirigir al login después del registro exitoso
+                        window.location.href = "/Home/Login";
+                    });
+                } else {
+                    Swal.fire("Error", data.message || "No se pudo completar el registro", "error");
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                Swal.fire("Error", "Ocurrió un error al procesar el registro", "error");
+            });
+    }
 
 });

@@ -1,0 +1,189 @@
+﻿@model IEnumerable<ASECCC_Digital.Models.AporteViewModel>
+
+@{
+    Layout = "_LayoutInterno";
+    ViewData["Title"] = "Mis Aportes";
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Mis Aportes</h5>
+                <button class="btn btn-primary btn-sm" type="button"
+                        data-bs-toggle="modal"
+                        data-bs-target="#modalNuevoAporte">
+                    <i class="ti ti-plus"></i> Nuevo Aporte
+                </button>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">
+                </p>
+
+                <div class="table-responsive mt-3">
+                    <table class="table table-striped align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Tipo de Aporte</th>
+                                <th>Monto</th>
+                                <th>Fecha Registro</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model != null && Model.Any())
+                            {
+                                foreach (var aporte in Model)
+                                {
+                                    <tr>
+                                        <td>@aporte.TipoAporte</td>
+                                        <td>₡@aporte.Monto.ToString("N2")</td>
+                                        <td>
+                                            @(aporte.FechaRegistro.HasValue
+                                                                                ? aporte.FechaRegistro.Value.ToString("dd/MM/yyyy")
+                                                                                : "-")
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-primary me-1">
+                                                Detalles
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-secondary">
+                                                Historial
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="4" class="text-center text-muted">
+                                        No aportes registrados
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                @if (ViewBag.Error != null)
+                {
+                    <div class="alert alert-danger mt-3">
+                        @ViewBag.Error
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL DEl APORTE -->
+<div class="modal fade" id="modalNuevoAporte" tabindex="-1" aria-labelledby="modalNuevoAporteLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalNuevoAporteLabel">Nuevo Aporte</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <form id="frmNuevoAporte">
+                    <div class="mb-3">
+                        <label for="tipoAporteNuevo" class="form-label">Tipo de Aporte</label>
+                        <select class="form-select" id="tipoAporteNuevo" required>
+                            <option value="">Seleccione...</option>
+                            <option value="Ordinario">Ordinario</option>
+                            <option value="Extraordinario">Extraordinario</option>
+                            <option value="Voluntario">Voluntario</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="montoAporteNuevo" class="form-label">Monto</label>
+                        <input type="number"
+                               class="form-control"
+                               id="montoAporteNuevo"
+                               min="1000"
+                               step="0.01"
+                               placeholder="Ej: 25000"
+                               required />
+                    </div>
+
+                    <div class="alert alert-info py-2">
+                        <small>
+                        </small>
+                    </div>
+
+                    <div class="d-flex justify-content-end">
+                        <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">
+                            Cancelar
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            Guardar Aporte
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const apiBase = 'https://localhost:7119/api/';
+        const usuarioId = 1;
+
+        document.addEventListener('DOMContentLoaded', function () {
+
+            const form = document.getElementById('frmNuevoAporte');
+            if (!form) return;
+
+            form.addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                const tipoSelect = document.getElementById('tipoAporteNuevo');
+                const montoInput = document.getElementById('montoAporteNuevo');
+
+                const tipoAporte = tipoSelect.value;
+                const monto = parseFloat(montoInput.value);
+
+                if (!tipoAporte || isNaN(monto) || monto <= 0) {
+                    alert('Complete correctamente los datos');
+                    return;
+                }
+
+                const payload = {
+                    usuarioId: usuarioId,
+                    tipoAporte: tipoAporte,
+                    monto: monto
+                };
+
+                fetch(apiBase + 'Aportes', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                })
+                    .then(resp => {
+                        if (!resp.ok) {
+                            throw new Error('Error en la respuesta del server');
+                        }
+                        return resp.text();
+                    })
+                    .then(() => {
+                        const modalEl = document.getElementById('modalNuevoAporte');
+                        const modalInstance = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+                        modalInstance.hide();
+
+                        form.reset();
+                        window.location.reload();
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        alert('un error al guardar el aporte');
+                    });
+            });
+
+        });
+    </script>
+}

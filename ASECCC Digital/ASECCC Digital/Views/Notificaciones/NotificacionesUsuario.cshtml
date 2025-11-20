@@ -1,0 +1,111 @@
+﻿@model IEnumerable<ASECCC_Digital.Models.NotificacionViewModel>
+
+@{
+    Layout = "_LayoutInterno";
+    ViewData["Title"] = "Mis Notificaciones";
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Mis Notificaciones</h5>
+
+                <button type="button"
+                        class="btn btn-sm btn-outline-primary"
+                        onclick="marcarTodas()">
+                    Marcar todas como leídas
+                </button>
+            </div>
+
+            <div class="card-body">
+
+                @if (Model != null && Model.Any())
+                {
+                    <div class="list-group">
+                        @foreach (var n in Model)
+                        {
+                            var leidaClass = n.Leido ? "list-group-item-light" : "list-group-item-primary";
+                            var fontWeight = n.Leido ? "fw-normal" : "fw-bold";
+
+                            <div class="list-group-item d-flex justify-content-between align-items-start @leidaClass mb-2">
+                                <div class="ms-2 me-auto">
+                                    <div class="d-flex justify-content-between">
+                                        <h6 class="mb-1 @fontWeight">@n.Titulo</h6>
+                                        <small class="text-muted">
+                                            @n.Fecha.ToString("dd/MM/yyyy HH:mm")
+                                        </small>
+                                    </div>
+                                    <p class="mb-1">@n.Mensaje</p>
+                                </div>
+
+                                @if (!n.Leido)
+                                {
+                                    <button type="button"
+                                            class="btn btn-sm btn-outline-success"
+                                            onclick="marcarLeida(@n.NotificacionId)">
+                                        Marcar leída
+                                    </button>
+                                }
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-info mb-0">
+                        No tiene notificaciones por el momento.
+                    </div>
+                }
+
+                @if (ViewBag.Error != null)
+                {
+                    <div class="alert alert-danger mt-3">
+                        @ViewBag.Error
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function marcarLeida(id) {
+            $.post('@Url.Action("MarcarLeida", "Notificaciones")',
+                { notificacionId: id },
+                function (resp) {
+                    if (resp.exito) {
+                        Swal.fire('Actualizado', 'La notificación fue marcada como leída.', 'success')
+                            .then(() => location.reload());
+                    } else {
+                        Swal.fire('Error', 'No se pudo actualizar la notificación.', 'error');
+                    }
+                });
+        }
+
+        function marcarTodas() {
+            Swal.fire({
+                title: 'Marcar todas como leídas',
+                text: 'Se marcarán todas las notificaciones como leídas.',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Aceptar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.post('@Url.Action("MarcarTodas", "Notificaciones")',
+                        {},
+                        function (resp) {
+                            if (resp.exito) {
+                                Swal.fire('Listo', 'Todas las notificaciones fueron marcadas como leídas.', 'success')
+                                    .then(() => location.reload());
+                            } else {
+                                Swal.fire('Error', 'No se pudieron actualizar las notificaciones.', 'error');
+                            }
+                        });
+                }
+            });
+        }
+    </script>
+}

@@ -1,0 +1,71 @@
+﻿@model IEnumerable<ASECCC_Digital.Models.AhorroViewModel>
+
+@{
+    Layout = "_LayoutInterno";
+    ViewData["Title"] = "Mis Ahorros";
+}
+
+<div class="row">
+    <div class="col-md-12">
+
+        <div class="card shadow-sm mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Mis Ahorros</h5>
+            </div>
+
+            <div class="card-body">
+
+                <div class="table-responsive mt-2">
+                    <table class="table table-striped align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Tipo de Ahorro</th>
+                                <th>Monto Inicial</th>
+                                <th>Monto Actual</th>
+                                <th>Estado</th>
+                                <th>Fecha Inicio</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model != null && Model.Any())
+                            {
+                                foreach (var ahorro in Model)
+                                {
+                                    var badge = ahorro.Estado == "Activo"
+                                    ? "bg-success"
+                                    : "bg-secondary";
+
+                                    <tr>
+                                        <td>@ahorro.TipoAhorro</td>
+                                        <td>₡@ahorro.MontoInicial.ToString("N2")</td>
+                                        <td>₡@ahorro.MontoActual.ToString("N2")</td>
+                                        <td>
+                                            <span class="badge @badge">@ahorro.Estado</span>
+                                        </td>
+                                        <td>@ahorro.FechaInicio?.ToString("dd/MM/yyyy")</td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted">
+                                        No tienes ahorros
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                @if (ViewBag.Error != null)
+                {
+                    <div class="alert alert-danger mt-3">
+                        @ViewBag.Error
+                    </div>
+                }
+            </div>
+        </div>
+
+    </div>
+</div>

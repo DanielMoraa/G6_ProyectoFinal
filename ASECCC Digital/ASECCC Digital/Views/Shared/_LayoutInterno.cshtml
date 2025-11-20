@@ -25,30 +25,30 @@
 </head>
 
 <body data-pc-preset="preset-1" data-pc-direction="ltr" data-pc-theme="light">
-  <!-- [ Pre-loader ] start -->
-<div class="loader-bg">
-  <div class="loader-track">
-    <div class="loader-fill"></div>
-  </div>
-</div>
-<!-- [ Pre-loader ] End -->
- <!-- [ Sidebar Menu ] start -->
-<nav class="pc-sidebar">
-  <div class="navbar-wrapper">
-    <div class="m-header">
-      <a asp-controller="Home" asp-action="Principal" class="b-brand text-primary">
-        <!-- ========   Change your logo from here   ============ -->
-        <img src="~/lib/img/ASECCC_LOGO3.1.png" alt="Logo">
-      </a>
+    <!-- [ Pre-loader ] start -->
+    <div class="loader-bg">
+        <div class="loader-track">
+            <div class="loader-fill"></div>
+        </div>
     </div>
-    <div class="navbar-content">
-      <ul class="pc-navbar">
-        <li class="pc-item">
-         <a asp-action="Principal" asp-controller="Home" class="pc-link">
-            <span class="pc-micon"><i class="ti ti-dashboard"></i></span>
-            <span class="pc-mtext">Principal</span>
-          </a>
-        </li>
+    <!-- [ Pre-loader ] End -->
+    <!-- [ Sidebar Menu ] start -->
+    <nav class="pc-sidebar">
+        <div class="navbar-wrapper">
+            <div class="m-header">
+                <a asp-controller="Home" asp-action="Principal" class="b-brand text-primary">
+                    <!-- ========   Change your logo from here   ============ -->
+                    <img src="~/lib/img/ASECCC_LOGO3.1.png" alt="Logo">
+                </a>
+            </div>
+            <div class="navbar-content">
+                <ul class="pc-navbar">
+                    <li class="pc-item">
+                        <a asp-action="Principal" asp-controller="Home" class="pc-link">
+                            <span class="pc-micon"><i class="ti ti-dashboard"></i></span>
+                            <span class="pc-mtext">Principal</span>
+                        </a>
+                    </li>
 
         <!-- MÓDULO: MI PERFIL -->
         <li class="pc-item pc-hasmenu">
@@ -237,6 +237,26 @@
             <div class="flex-shrink-0">
               <img src="~/lib/img/avatar-2.jpg" alt="user-image" class="user-avtar wid-35">
             </div>
+            <!-- [Mobile Media Block end] -->
+            <div class="ms-auto">
+
+                <li class="dropdown pc-h-item header-user-profile">
+                    <a class="pc-head-link dropdown-toggle arrow-none me-0"
+                       data-bs-toggle="dropdown"
+                       href="#"
+                       role="button"
+                       aria-haspopup="false"
+                       data-bs-auto-close="outside"
+                       aria-expanded="false">
+                        <img src="~/lib/img/avatar-2.jpg" alt="user-image" class="user-avtar">
+                        <span>@nombreUsuario</span>
+                    </a>
+                    <div class="dropdown-menu dropdown-user-profile dropdown-menu-end pc-h-dropdown">
+                        <div class="dropdown-header">
+                            <div class="d-flex mb-1">
+                                <div class="flex-shrink-0">
+                                    <img src="~/lib/img/avatar-2.jpg" alt="user-image" class="user-avtar wid-35">
+                                </div>
                                 <div class="flex-grow-1 ms-3" style="min-width: 0;">
                                     <h6 class="mb-1" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                                         @nombreUsuario
@@ -245,48 +265,47 @@
                                 </div>
 
                                 <a asp-action="CerrarSesion" asp-controller="Home" class="pc-head-link bg-transparent"><i class="ti ti-power text-danger"></i></a>
-          </div>
+                            </div>
+                        </div>
+                        <ul class="nav drp-tabs nav-fill nav-tabs" id="mydrpTab" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active"
+                                        id="drp-t1"
+                                        data-bs-toggle="tab"
+                                        data-bs-target="#drp-tab-1"
+                                        type="button"
+                                        role="tab"
+                                        aria-controls="drp-tab-1"
+                                        aria-selected="true">
+                                    <i class="ti ti-user"></i> Profile
+                                </button>
+                            </li>
+
+                        </ul>
+                        <div class="tab-content" id="mysrpTabContent">
+                            <div class="tab-pane fade show active" id="drp-tab-1" role="tabpanel" aria-labelledby="drp-t1" tabindex="0">
+                                <a asp-action="EditarPerfil" asp-controller="Usuario" class="dropdown-item">
+                                    <i class="ti ti-edit-circle"></i>
+                                    <span>Editar Perfil</span>
+                                </a>
+
+                                <a asp-action="Seguridad" asp-controller="Usuario" class="dropdown-item">
+                                    <i class="ti ti-settings"></i>
+                                    <span>Seguridad</span>
+                                </a>
+
+                                <a asp-action="CerrarSesion" asp-controller="Home" class="dropdown-item">
+                                    <i class="ti ti-power"></i>
+                                    <span>Cerrar Sesión</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            </div>
         </div>
-        <ul class="nav drp-tabs nav-fill nav-tabs" id="mydrpTab" role="tablist">
-          <li class="nav-item" role="presentation">
-            <button
-              class="nav-link active"
-              id="drp-t1"
-              data-bs-toggle="tab"
-              data-bs-target="#drp-tab-1"
-              type="button"
-              role="tab"
-              aria-controls="drp-tab-1"
-              aria-selected="true"
-              ><i class="ti ti-user"></i> Profile</button
-            >
-          </li>
-
-        </ul>
-        <div class="tab-content" id="mysrpTabContent">
-          <div class="tab-pane fade show active" id="drp-tab-1" role="tabpanel" aria-labelledby="drp-t1" tabindex="0">
-            <a asp-action="EditarPerfil" asp-controller="Usuario" class="dropdown-item">
-              <i class="ti ti-edit-circle"></i>
-              <span>Editar Perfil</span>
-            </a>
-
-            <a asp-action="Seguridad" asp-controller="Usuario" class="dropdown-item">
-              <i class="ti ti-settings"></i>
-              <span>Seguridad</span>
-            </a>
-
-           <a asp-action="CerrarSesion" asp-controller="Home" class="dropdown-item">
-              <i class="ti ti-power"></i>
-              <span>Cerrar Sesión</span>
-            </a>
-          </div>     
-        </div>
-      </div>
-    </li>
-</div>
- </div>
-</header>
-<!-- [ Header ] end -->
+    </header>
+    <!-- [ Header ] end -->
     <!-- [ Main Content ] start -->
     <div class="pc-container">
         <div class="pc-content">

@@ -1,0 +1,14 @@
+﻿@model ASECCC_Digital.Models.AhorroViewModel
+
+<div class="text-start">
+    <p><strong>Asociado:</strong> @Model.NombreAsociado</p>
+    <p><strong>Tipo de ahorro:</strong> @Model.TipoAhorro</p>
+    <p><strong>Monto inicial:</strong> ₡@Model.MontoInicial.ToString("N2")</p>
+    <p><strong>Monto actual:</strong> ₡@Model.MontoActual.ToString("N2")</p>
+    <p><strong>Estado:</strong> @Model.Estado</p>
+    <p><strong>Fecha de inicio:</strong> @Model.FechaInicio?.ToString("dd/MM/yyyy")</p>
+    @if (Model.Plazo.HasValue)
+    {
+        <p><strong>Plazo:</strong> @Model.Plazo meses</p>
+    }
+</div>
