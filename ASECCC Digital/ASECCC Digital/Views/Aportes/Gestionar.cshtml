@@ -1,0 +1,142 @@
+﻿@model IEnumerable<ASECCC_Digital.Models.AporteViewModel>
+
+@{
+    Layout = "_LayoutInterno";
+    ViewData["Title"] = "Gestionar Aportes";
+
+    var qNombre = Context.Request.Query["nombreAsociado"].ToString();
+    var qTipo = Context.Request.Query["tipoAporte"].ToString();
+    var qDesde = Context.Request.Query["fechaDesde"].ToString();
+    var qHasta = Context.Request.Query["fechaHasta"].ToString();
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Gestionar Aportes</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">
+                </p>
+
+                <form method="get" class="row g-3 mb-3">
+                    <div class="col-md-4">
+                        <label class="form-label">Nombre del Asociado</label>
+                        <input type="text"
+                               class="form-control"
+                               name="nombreAsociado"
+                               value="@qNombre"
+                               placeholder="Buscar por nombre" />
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label">Tipo de Aporte</label>
+                        <select class="form-select" name="tipoAporte">
+                            <option value="">Todos</option>
+
+                            @* Ordinario *@
+                            @if (qTipo == "Ordinario")
+                            {
+                                <option value="Ordinario" selected>Ordinario</option>
+                            }
+                            else
+                            {
+                                <option value="Ordinario">Ordinario</option>
+                            }
+
+                            @* Extraordinario *@
+                            @if (qTipo == "Extraordinario")
+                            {
+                                <option value="Extraordinario" selected>Extraordinario</option>
+                            }
+                            else
+                            {
+                                <option value="Extraordinario">Extraordinario</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="col-md-2">
+                        <label class="form-label">Fecha desde</label>
+                        <input type="date"
+                               class="form-control"
+                               name="fechaDesde"
+                               value="@qDesde" />
+                    </div>
+
+                    <div class="col-md-2">
+                        <label class="form-label">Fecha hasta</label>
+                        <input type="date"
+                               class="form-control"
+                               name="fechaHasta"
+                               value="@qHasta" />
+                    </div>
+
+                    <div class="col-md-1 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="ti ti-search"></i> Buscar
+                        </button>
+                    </div>
+                </form>
+
+                <div class="table-responsive mt-3">
+                    <table class="table table-striped align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Asociado</th>
+                                <th>Fecha</th>
+                                <th>Monto</th>
+                                <th>Tipo</th>
+                                <th>Descripción</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model != null && Model.Any())
+                            {
+                                foreach (var aporte in Model)
+                                {
+                                    <tr>
+                                        <td>@aporte.NombreAsociado</td>
+                                        <td>@aporte.FechaRegistro?.ToString("dd/MM/yyyy")</td>
+                                        <td>₡@aporte.Monto.ToString("N2")</td>
+                                        <td>@aporte.TipoAporte</td>
+                                        <td>—</td>
+                                        <td>
+                                            <button type="button"
+                                                    class="btn btn-sm btn-outline-primary me-1"
+                                                    disabled>
+                                                Detalles
+                                            </button>
+                                            <button type="button"
+                                                    class="btn btn-sm btn-outline-danger"
+                                                    disabled>
+                                                Eliminar
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="6" class="text-center text-muted">
+                                        No hay registros
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                @if (ViewBag.Error != null)
+                {
+                    <div class="alert alert-danger mt-3">
+                        @ViewBag.Error
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

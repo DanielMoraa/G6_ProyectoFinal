@@ -1,0 +1,56 @@
+﻿@{
+    Layout = "_LayoutInterno";
+    ViewData["Title"] = "Crear Notificación";
+}
+
+@section PageHeader {
+    <div class="page-header">
+        <div class="page-block">
+            <div class="row align-items-center">
+                <div class="col-md-12">
+                    <div class="page-header-title">
+                        <h5 class="m-b-10">Crear Notificación</h5>
+                    </div>
+                    <ul class="breadcrumb">
+                        <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Principal">Home</a></li>
+                        <li class="breadcrumb-item"><a asp-controller="Notificaciones" asp-action="Administrador">Notificaciones</a></li>
+                        <li class="breadcrumb-item" aria-current="page">Crear</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <form>
+
+                    <div class="mb-3">
+                        <label class="form-label">Título</label>
+                        <input type="text" class="form-control">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Mensaje</label>
+                        <textarea class="form-control" rows="4"></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Enviar a</label>
+                        <select class="form-select">
+                            <option value="todos">Todos los asociados</option>
+                            <option value="usuarios">Usuarios activos</option>
+                            <option value="admins">Administradores</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Enviar</button>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
