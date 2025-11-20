@@ -1,0 +1,154 @@
+﻿@{
+    ViewBag.Title = "RegistrarAbonos";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    @Html.Partial("_MenuModulos");
+}
+
+    <div class="container my-5">
+        <h1 class="text-center mb-4">Registro de Abonos a Préstamos</h1>
+
+        <!-- Campo de búsqueda de asociado con validaciones -->
+        <div class="mb-4">
+            <label for="buscarAsociado" class="form-label">Buscar Asociado:</label>
+            <input type="text"
+                   id="buscarAsociado"
+                   class="form-control"
+                   placeholder="Ingrese el nombre del asociado"
+                   pattern="[a-zA-Z\s]+"
+                   title="Solo se permiten letras y espacios">
+            <button class="btn btn-primary mt-2" onclick="buscarAsociado()" aria-label="Buscar asociado">Buscar</button>
+        </div>
+
+        <!-- Mensaje de error si no se encuentran préstamos -->
+        <p id="errorMensaje" class="text-danger d-none">No se encontraron préstamos para este asociado.</p>
+
+        <!-- Tabla de préstamos activos -->
+        <div id="prestamosActivos" class="d-none">
+            <h4>Préstamos Activos</h4>
+            <form id="abonosForm">
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Tipo Prestamo</th>
+                                <th>Saldo Inicial</th>
+                                <th>Saldo Actual</th>
+                                <th>Cuota</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Personal</td>
+                                <td>₡100,000</td>
+                                <td>₡50,000</td>
+                                <td>₡5,000</td>
+                                <td>
+                                    <button type="button" class="btn btn-primary" onclick="abrirModal('001', 50000)">Abonar</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Urgente</td>
+                                <td>₡200,000</td>
+                                <td>₡120,000</td>
+                                <td>₡10,000</td>
+                                <td>
+                                    <button type="button" class="btn btn-primary" onclick="abrirModal('002', 120000)">Abonar</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <button type="submit" id="registrarAbonos" class="btn btn-success" disabled>Registrar Abonos</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal para ingresar el monto a abonar -->
+    <div class="modal fade" id="modalAbono" tabindex="-1" aria-labelledby="modalAbonoLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalAbonoLabel">Registrar Abono</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formAbonoModal">
+                        <div class="mb-3">
+                            <label for="idPrestamo" class="form-label">ID Préstamo</label>
+                            <input type="text" id="idPrestamo" class="form-control" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label for="saldoActual" class="form-label">Saldo Actual</label>
+                            <input type="text" id="saldoActual" class="form-control" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label for="montoAbono" class="form-label">Monto a Abonar</label>
+                            <input type="number" id="montoAbono" class="form-control" placeholder="Digite el monto" min="0" step="1000">
+                        </div>
+                        <button type="submit" class="btn btn-success">Registrar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simula la búsqueda del asociado
+        function buscarAsociado() {
+            const prestamosDiv = document.getElementById('prestamosActivos');
+            const errorMensaje = document.getElementById('errorMensaje');
+
+            // Simula la lógica de búsqueda
+            const asociadoEncontrado = true; // Cambiar según la lógica de backend
+
+            if (asociadoEncontrado) {
+                prestamosDiv.classList.remove('d-none');
+                errorMensaje.classList.add('d-none');
+            } else {
+                prestamosDiv.classList.add('d-none');
+                errorMensaje.classList.remove('d-none');
+            }
+        }
+
+        // Abre el modal con los datos del préstamo
+        function abrirModal(idPrestamo, saldoActual) {
+            document.getElementById('idPrestamo').value = idPrestamo;
+            document.getElementById('saldoActual').value = `₡${saldoActual}`;
+            const modal = new bootstrap.Modal(document.getElementById('modalAbono'));
+            modal.show();
+        }
+
+        // Valida los campos de abono y habilita/deshabilita el botón de enviar
+        function validarAbonos() {
+            const inputs = document.querySelectorAll('.abono-input');
+            const registrarAbonos = document.getElementById('registrarAbonos');
+            let isValid = false;
+
+            inputs.forEach(input => {
+                if (input.value.trim() !== '' && parseFloat(input.value) > 0) {
+                    isValid = true;
+                }
+            });
+
+            registrarAbonos.disabled = !isValid;
+        }
+
+        // Validación adicional al enviar el formulario
+        document.getElementById('abonosForm').addEventListener('submit', function (event) {
+            const inputs = document.querySelectorAll('.abono-input');
+            let isValid = true;
+
+            inputs.forEach(input => {
+                if (input.value.trim() === '' || parseFloat(input.value) <= 0) {
+                    isValid = false;
+                }
+            });
+
+            if (!isValid) {
+                event.preventDefault();
+                alert('Por favor, completa los campos correctamente antes de enviar.');
+            }
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

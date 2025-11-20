@@ -1,0 +1,212 @@
+﻿@{
+    ViewBag.Title = "PerfilAsociado";
+    Layout = "~/Views/Shared/_LayoutInterno.cshtml";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-sm-8 col-md-6">
+            <!-- Card del Perfil -->
+            <div class="card shadow-lg border-0 rounded-3">
+                <div class="card-header text-center bg-primary text-white">
+                    <h3>Perfil del Asociado</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-12">
+                            <h5 class="text-primary">Nombre Completo</h5>
+                            <p>Juan Pérez</p>
+                        </div>
+                        <div class="col-12">
+                            <h5 class="text-primary">Correo Electrónico</h5>
+                            <div class="d-flex justify-content-between">
+                                <p class="mb-0" id="correo">juan.perez@ejemplo.com</p>
+                                <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#modalCorreo">Modificar</button>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <h5 class="text-primary">Número de Identificación</h5>
+                            <p>123456789</p>
+                        </div>
+                        <div class="col-12">
+                            <h5 class="text-primary">Teléfono</h5>
+                            <div class="d-flex justify-content-between">
+                                <p class="mb-0" id="telefono">+1234567890</p>
+                                <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#modalTelefono">Modificar</button>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <h5 class="text-primary">Dirección</h5>
+                            <div class="d-flex justify-content-between">
+                                <p class="mb-0" id="direccion">Calle Ficticia 123, Ciudad</p>
+                                <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#modalDireccion">Modificar</button>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <h5 class="text-primary">Fecha de Ingreso</h5>
+                            <p>01 Mayo 2020</p>
+                        </div>
+                        <div class="col-12">
+                            <h5 class="text-primary">Estado de Afiliación</h5>
+                            <p class="badge bg-success">Activo</p>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para modificar correo electrónico -->
+<div class="modal fade" id="modalCorreo" tabindex="-1" aria-labelledby="modalCorreoLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalCorreoLabel">Modificar Correo Electrónico</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formCorreo">
+                    <div class="mb-3">
+                        <label for="nuevoCorreo" class="form-label">Nuevo Correo</label>
+                        <input type="email" class="form-control" id="nuevoCorreo" placeholder="juan.perez@nuevo.com">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="actualizarCorreo()">Guardar Cambios</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para modificar teléfono -->
+<div class="modal fade" id="modalTelefono" tabindex="-1" aria-labelledby="modalTelefonoLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTelefonoLabel">Modificar Teléfono</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formTelefono">
+                    <div class="mb-3">
+                        <label for="nuevoTelefono" class="form-label">Nuevo Teléfono</label>
+                        <input type="text" class="form-control" id="nuevoTelefono" placeholder="+1234567890">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="actualizarTelefono()">Guardar Cambios</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para modificar dirección -->
+<div class="modal fade" id="modalDireccion" tabindex="-1" aria-labelledby="modalDireccionLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalDireccionLabel">Modificar Dirección</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formDireccion">
+                    <div class="mb-3">
+                        <label for="nuevaDireccion" class="form-label">Nueva Dirección</label>
+                        <input type="text" class="form-control" id="nuevaDireccion" placeholder="Calle Ficticia 123, Ciudad">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="actualizarDireccion()">Guardar Cambios</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    function actualizarCorreo() {
+        var nuevoCorreo = document.getElementById("nuevoCorreo").value;
+        document.getElementById("correo").innerText = nuevoCorreo;
+        var modalCorreo = new bootstrap.Modal(document.getElementById('modalCorreo'));
+        modalCorreo.hide();
+    }
+
+    function actualizarTelefono() {
+        var nuevoTelefono = document.getElementById("nuevoTelefono").value;
+        document.getElementById("telefono").innerText = nuevoTelefono;
+        var modalTelefono = new bootstrap.Modal(document.getElementById('modalTelefono'));
+        modalTelefono.hide();
+    }
+
+    function actualizarDireccion() {
+        var nuevaDireccion = document.getElementById("nuevaDireccion").value;
+        document.getElementById("direccion").innerText = nuevaDireccion;
+        var modalDireccion = new bootstrap.Modal(document.getElementById('modalDireccion'));
+        modalDireccion.hide();
+    }
+</script>
+
+<style>
+    .card {
+        margin-bottom: 50px; /* Ajusta el valor según sea necesario */
+        border-radius: 10px;
+    }
+
+    .card-header {
+        background-color: #003366; /* Azul oscuro */
+        color: white;
+    }
+
+    .card-body {
+        background-color: #f8f9fa;
+    }
+
+        .card-body h5 {
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+    .badge {
+        font-size: 1rem;
+        font-weight: normal;
+    }
+
+    .text-primary {
+        color: #003366 !important;
+    }
+
+    .shadow-lg {
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+    }
+
+    /* Asegura que los botones tengan margen en pantallas pequeñas */
+    .btn-warning {
+        margin-right: 10px; /* Espacio a la derecha del botón */
+    }
+
+    /* Espaciado en pantallas pequeñas */
+    .mb-sm-0 {
+        margin-bottom: 0 !important;
+    }
+
+    .mb-3 {
+        margin-bottom: 1rem !important;
+    }
+
+    .d-flex {
+        align-items: center;
+    }
+
+        .d-flex .btn {
+            margin-left: 10px;
+        }
+</style>

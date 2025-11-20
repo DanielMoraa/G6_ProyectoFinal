@@ -49,39 +49,153 @@
           </a>
         </li>
 
+        <!-- MÓDULO: MI PERFIL -->
+        <li class="pc-item pc-hasmenu">
+            <a href="#!" class="pc-link">
+                <span class="pc-micon"><i class="ti ti-user"></i></span>
+                <span class="pc-mtext">Mi Perfil</span>
+                <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
+            </a>
+            <ul class="pc-submenu">
+                <li class="pc-item pc-caption">
+                    <label>Perfil</label>
+                    <i class="ti ti-user-circle"></i>
+                </li>
+                <li class="pc-item">
+                    <a asp-controller="Usuario" asp-action="EditarPerfil" class="pc-link">
+                        <span class="pc-micon"><i class="ti ti-edit"></i></span>
+                        <span class="pc-mtext">Editar Perfil</span>
+                    </a>
+                </li>
+                <li class="pc-item">
+                    <a asp-controller="Usuario" asp-action="Seguridad" class="pc-link">
+                        <span class="pc-micon"><i class="ti ti-lock"></i></span>
+                        <span class="pc-mtext">Cambiar Contraseña</span>
+                    </a>
+                </li>
+            </ul>
+        </li>
 
-                    <li class="pc-item pc-hasmenu">
-                        <a href="#!" class="pc-link">
-                            <span class="pc-micon"><i class="ti ti-menu"></i></span><span class="pc-mtext">
-                                Asociados
-                            </span><span class="pc-arrow"><i data-feather="chevron-right"></i></span>
-                        </a>
-                        <ul class="pc-submenu">
-                            <li class="pc-item pc-caption">
-                                <label>Pages</label>
-                                <i class="ti ti-news"></i>
-                            </li>
-                            <li class="pc-item">
-                                <a asp-controller="Usuario" asp-action="BuscarDesactivarAsociado" class="pc-link">
-                                    <span class="pc-micon"><i class="ti ti-search"></i></span>
-                                    <span class="pc-mtext">Buscar y desactivar Asociado</span>
-                                </a>
-                            </li>
-                            <li class="pc-item">
-                                <a asp-controller="Usuario" asp-action="LiquidarAsociado" class="pc-link">
-                                    <span class="pc-micon"><i class="ti ti-report-money"></i></span>
-                                    <span class="pc-mtext">Liquidar Asociado</span>
-                                </a>
-                            </li>
-                            
-                        </ul>
-      
+        <!-- MÓDULO: PRÉSTAMOS -->
+        <li class="pc-item pc-hasmenu">
+            <a href="#!" class="pc-link">
+                <span class="pc-micon"><i class="ti ti-coin"></i></span>
+                <span class="pc-mtext">Préstamos</span>
+                <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
+            </a>
+            <ul class="pc-submenu">
+                <li class="pc-item pc-caption">
+                    <label>Gestión de Préstamos</label>
+                    <i class="ti ti-report-money"></i>
+                </li>
+                <li class="pc-item">
+                    <a asp-controller="Prestamos" asp-action="SolicitudPrestamo" class="pc-link">
+                        <span class="pc-micon"><i class="ti ti-file-plus"></i></span>
+                        <span class="pc-mtext">Solicitar Préstamo</span>
+                    </a>
+                </li>
+                <li class="pc-item">
+                    <a asp-controller="Prestamos" asp-action="ConsultaPrestamoAsociado" class="pc-link">
+                        <span class="pc-micon"><i class="ti ti-list"></i></span>
+                        <span class="pc-mtext">Mis Préstamos</span>
+                    </a>
+                </li>
+                <li class="pc-item">
+                    <a asp-controller="Prestamos" asp-action="RevisionPrestamos" class="pc-link">
+                        <span class="pc-micon"><i class="ti ti-clipboard-check"></i></span>
+                        <span class="pc-mtext">Revisar Solicitudes</span>
+                    </a>
+                </li>
+                <li class="pc-item">
+                    <a asp-controller="Prestamos" asp-action="GestionSolicitudes" class="pc-link">
+                        <span class="pc-micon"><i class="ti ti-settings"></i></span>
+                        <span class="pc-mtext">Gestionar Solicitudes</span>
+                    </a>
+                </li>
+            </ul>
+        </li>
+
+        <!-- MÓDULO: REPORTES -->
+        <li class="pc-item pc-hasmenu">
+            <a href="#!" class="pc-link">
+                <span class="pc-micon"><i class="ti ti-chart-bar"></i></span>
+                <span class="pc-mtext">Reportes</span>
+                <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
+            </a>
+            <ul class="pc-submenu">
+                <li class="pc-item pc-caption">
+                    <label>Informes y Estadísticas</label>
+                    <i class="ti ti-file-analytics"></i>
+                </li>
+                <li class="pc-item">
+                    <a asp-controller="Reportes" asp-action="ResumenFinanciero" class="pc-link">
+                        <span class="pc-micon"><i class="ti ti-dashboard"></i></span>
+                        <span class="pc-mtext">Resumen Financiero</span>
+                    </a>
+                </li>
+                <li class="pc-item">
+                    <a asp-controller="Reportes" asp-action="HistorialTransacciones" class="pc-link">
+                        <span class="pc-micon"><i class="ti ti-history"></i></span>
+                        <span class="pc-mtext">Historial de Transacciones</span>
+                    </a>
+                </li>
+                <li class="pc-item">
+                    <a asp-controller="Reportes" asp-action="EstadoCuenta" class="pc-link">
+                        <span class="pc-micon"><i class="ti ti-file-text"></i></span>
+                        <span class="pc-mtext">Estado de Cuenta</span>
+                    </a>
+                </li>
+                <li class="pc-item">
+                    <a asp-controller="Reportes" asp-action="ReportePrestamos" class="pc-link">
+                        <span class="pc-micon"><i class="ti ti-report"></i></span>
+                        <span class="pc-mtext">Reporte de Préstamos</span>
+                    </a>
+                </li>
+                <li class="pc-item">
+                    <a asp-controller="Reportes" asp-action="ReporteAhorros" class="pc-link">
+                        <span class="pc-micon"><i class="ti ti-piggy-bank"></i></span>
+                        <span class="pc-mtext">Reporte de Ahorros</span>
+                    </a>
+                </li>
+            </ul>
+        </li>
+
+        <!-- MÓDULO: ASOCIADOS (Ya existente) -->
+        <li class="pc-item pc-hasmenu">
+            <a href="#!" class="pc-link">
+                <span class="pc-micon"><i class="ti ti-users"></i></span>
+                <span class="pc-mtext">Asociados</span>
+                <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
+            </a>
+            <ul class="pc-submenu">
+                <li class="pc-item pc-caption">
+                    <label>Gestión de Asociados</label>
+                    <i class="ti ti-news"></i>
+                </li>
+                <li class="pc-item">
+                    <a asp-controller="Usuario" asp-action="BuscarDesactivarAsociado" class="pc-link">
+                        <span class="pc-micon"><i class="ti ti-search"></i></span>
+                        <span class="pc-mtext">Buscar y Desactivar</span>
+                    </a>
+                </li>
+                <li class="pc-item">
+                    <a asp-controller="Usuario" asp-action="LiquidarAsociado" class="pc-link">
+                        <span class="pc-micon"><i class="ti ti-report-money"></i></span>
+                        <span class="pc-mtext">Liquidar Asociado</span>
+                    </a>
+                </li>
+            </ul>
+        </li>
+
+      </ul>
     </div>
   </div>
 </nav>
-<!-- [ Sidebar Menu ] end --> <!-- [ Header Topbar ] start -->
+<!-- [ Sidebar Menu ] end --> 
+<!-- [ Header Topbar ] start -->
 <header class="pc-header">
-  <div class="header-wrapper"> <!-- [Mobile Media Block] start -->
+  <div class="header-wrapper"> 
+<!-- [Mobile Media Block] start -->
 <div class="me-auto pc-mob-drp">
   <ul class="list-unstyled">
     <!-- ======= Menu collapse Icon ===== -->
@@ -221,6 +335,6 @@
     <script>layout_rtl_change('false');</script>
     <script>preset_change("preset-1");</script>
     <script>font_change("Public-Sans");</script>
-
+    @RenderSection("Scripts", required: false)
 </body>
 </html>

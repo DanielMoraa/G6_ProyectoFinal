@@ -1,0 +1,220 @@
+﻿@model ASECCC_Digital.Models.SolicitudPrestamoViewModel
+
+@{
+    Layout = "~/Views/Shared/_LayoutInterno.cshtml";
+}
+
+
+<div class="container my-4">
+    <h2 class="text-center mb-4">Solicitudes de Préstamos</h2>
+    <div class="row">
+        <!-- Columna: Pendiente -->
+        <div class="col-md-3" id="pendiente-column">
+            <h5 class="text-center text-primary">Pendiente</h5>
+            <div class="bg-light p-3 rounded shadow-sm" style="min-height: 300px;" id="pendiente">
+                @foreach (var solicitud in Model.Solicitudes.Pendientes)
+                {
+                    <div class="card mb-3 border-primary solicitud-card"
+                         data-id="@solicitud.SolicitudPrestamoId"
+                         data-bs-toggle="modal" data-bs-target="#solicitudDetallesModal">
+                        <div class="card-body">
+                            <h6 class="card-title">Solicitud #@solicitud.SolicitudPrestamoId</h6>
+                            <p class="card-text">
+                                <strong>Solicitante:</strong> @(solicitud.Usuario?.NombreCompleto ?? "N/A")<br />
+                                <strong>Monto:</strong> ₡@solicitud.MontoSolicitud.ToString("N2")<br />
+                                <strong>Fecha:</strong> @solicitud.FechaSolicitud.ToString("dd/MM/yyyy")
+                            </p>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Columna: En Revisión -->
+        <div class="col-md-3" id="revision-column">
+            <h5 class="text-center text-warning">En Revisión</h5>
+            <div class="bg-light p-3 rounded shadow-sm" style="min-height: 300px;" id="revision">
+                @foreach (var solicitud in Model.Solicitudes.EnRevision)
+                {
+                    <div class="card mb-3 border-warning solicitud-card"
+                         data-id="@solicitud.SolicitudPrestamoId"
+                         data-bs-toggle="modal" data-bs-target="#solicitudDetallesModal">
+                        <div class="card-body">
+                            <h6 class="card-title">Solicitud #@solicitud.SolicitudPrestamoId</h6>
+                            <p class="card-text">
+                                <strong>Solicitante:</strong> @(solicitud.Usuario?.NombreCompleto ?? "N/A")<br />
+                                <strong>Monto:</strong> ₡@solicitud.MontoSolicitud.ToString("N2")<br />
+                                <strong>Fecha:</strong> @solicitud.FechaSolicitud.ToString("dd/MM/yyyy")
+                            </p>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Columna: Aprobado -->
+        <div class="col-md-3" id="aprobado-column">
+            <h5 class="text-center text-success">Aprobado</h5>
+            <div class="bg-light p-3 rounded shadow-sm" style="min-height: 300px;" id="aprobado">
+                @foreach (var solicitud in Model.Solicitudes.Aprobadas)
+                {
+                    <div class="card mb-3 border-success solicitud-card"
+                         data-id="@solicitud.SolicitudPrestamoId"
+                         data-bs-toggle="modal" data-bs-target="#solicitudDetallesModal">
+                        <div class="card-body">
+                            <h6 class="card-title">Solicitud #@solicitud.SolicitudPrestamoId</h6>
+                            <p class="card-text">
+                                <strong>Nombre Completo:</strong> @(solicitud.Usuario?.NombreCompleto ?? "N/A")<br />
+                                <strong>Monto:</strong> ₡@solicitud.MontoSolicitud.ToString("N2")<br />
+                                <strong>Fecha:</strong> @solicitud.FechaSolicitud.ToString("dd/MM/yyyy")
+                            </p>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Columna: Rechazado -->
+        <div class="col-md-3" id="rechazado-column">
+            <h5 class="text-center text-danger">Rechazado</h5>
+            <div class="bg-light p-3 rounded shadow-sm" style="min-height: 300px;" id="rechazado">
+                @foreach (var solicitud in Model.Solicitudes.Rechazadas)
+                {
+                    <div class="card mb-3 border-danger solicitud-card"
+                         data-id="@solicitud.SolicitudPrestamoId"
+                         data-bs-toggle="modal" data-bs-target="#solicitudDetallesModal">
+                        <div class="card-body">
+                            <h6 class="card-title">Solicitud #@solicitud.SolicitudPrestamoId</h6>
+                            <p class="card-text">
+                                <strong>Nombre Completo:</strong> @(solicitud.Usuario?.NombreCompleto ?? "N/A")<br />
+                                <strong>Monto:</strong> ₡@solicitud.MontoSolicitud.ToString("N2")<br />
+                                <strong>Fecha:</strong> @solicitud.FechaSolicitud.ToString("dd/MM/yyyy")
+                            </p>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Incluir el partial del modal -->
+<partial name="_SolicitudDetalles" />
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('.solicitud-card').click(function () {
+                var solicitudId = $(this).data('id');
+                console.log("Solicitud seleccionada:", solicitudId);
+
+                $.ajax({
+                    url: '@Url.Action("ObtenerSolicitudPorId", "Prestamos")',
+                    type: 'GET',
+                    data: { id: solicitudId },
+                    success: function (data) {
+                        if (data.error) {
+                            console.error("Error:", data.error);
+                            return;
+                        }
+
+                        // Llenar campos básicos
+                        $('#solicitud-id').val(data.solicitudPrestamoId || data.SolicitudPrestamoId);
+                        $('#usuario-id').val(data.usuarioId || data.UsuarioId);
+                        $('#nombreCompleto').text(data.nombreCompleto || 'No disponible');
+                        $('#estadoCivil').text(data.estadoCivil || 'No disponible');
+                        $('#pagaAlquiler').text((data.pagaAlquiler ? 'Sí' : 'No'));
+                        $('#montoAlquiler').text(data.montoAlquiler ? '₡' + parseFloat(data.montoAlquiler).toLocaleString('es-CR', {minimumFractionDigits: 2}) : 'No aplica');
+                        
+                        // Información del préstamo
+                        $('#tipoPrestamoTexto').text(data.tipoPrestamo || 'No especificado');
+                        $('#montoSolicitud').text(parseFloat(data.montoSolicitud || 0).toLocaleString('es-CR', {minimumFractionDigits: 2}));
+                        $('#plazoMeses').text(data.plazoMeses || 'N/A');
+                        $('#cuotaSemanalSolicitud').text(parseFloat(data.cuotaSemanalSolicitud || 0).toLocaleString('es-CR', {minimumFractionDigits: 2}));
+                        $('#propositoPrestamo').text(data.propositoPrestamo || 'Sin especificar');
+                        
+                        // Estado con badge
+                        var estado = data.estadoSolicitud || 'Desconocido';
+                        var badgeClass = estado === 'Pendiente' ? 'bg-warning' :
+                                       estado === 'Aprobada' ? 'bg-success' :
+                                       estado === 'En Revisión' ? 'bg-info' : 'bg-danger';
+                        $('#estadoTexto').text(estado).attr('class', 'badge ' + badgeClass);
+
+                        // Mostrar/ocultar sección de deudas
+                        if (data.nombreAcreedor) {
+                            $('#nombreAcreedor').text(data.nombreAcreedor);
+                            $('#totalCredito').text(parseFloat(data.totalCredito || 0).toLocaleString('es-CR', {minimumFractionDigits: 2}));
+                            $('#saldoCredito').text(parseFloat(data.saldoCredito || 0).toLocaleString('es-CR', {minimumFractionDigits: 2}));
+                            $('#abonoSemanal').text(parseFloat(data.abonoSemanal || 0).toLocaleString('es-CR', {minimumFractionDigits: 2}));
+                            $('#deudas-section').show();
+                        } else {
+                            $('#deudas-section').hide();
+                        }
+
+                        // Mostrar/ocultar sección de fiador
+                        if (data.nombreDeudor) {
+                            $('#nombreDeudor').text(data.nombreDeudor);
+                            $('#totalPrestamo').text(parseFloat(data.totalPrestamo || 0).toLocaleString('es-CR', {minimumFractionDigits: 2}));
+                            $('#saldoPrestamo').text(parseFloat(data.saldoPrestamo || 0).toLocaleString('es-CR', {minimumFractionDigits: 2}));
+                            $('#fiador-section').show();
+                        } else {
+                            $('#fiador-section').hide();
+                        }
+
+                        // Mostrar botones según el estado
+                        $('#btn-revisar, #btn-aprobar, #btn-rechazar').hide();
+                        if (estado === 'Pendiente') {
+                            $('#btn-revisar, #btn-aprobar, #btn-rechazar').show();
+                        } else if (estado === 'En Revisión') {
+                            $('#btn-aprobar, #btn-rechazar').show();
+                        }
+
+                        // Mostrar el modal
+                        var modalEl = document.getElementById('solicitudDetallesModal');
+                        var modal = new bootstrap.Modal(modalEl);
+                        modal.show();
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error en la llamada AJAX:", error);
+                        alert('Error al cargar los detalles de la solicitud');
+                    }
+                });
+            });
+        });
+
+        function cambiarEstado(nuevoEstado) {
+            var solicitudId = $('#solicitud-id').val();
+            
+            $.ajax({
+                url: '@Url.Action("CambiarEstadoSolicitud", "Prestamos")',
+                type: 'POST',
+                data: { 
+                    solicitudId: solicitudId, 
+                    nuevoEstado: nuevoEstado 
+                },
+                success: function (response) {
+                    if (response.success) {
+                        alert(response.message);
+                        location.reload(); // Recargar la página para ver los cambios
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function () {
+                    alert('Error al cambiar el estado de la solicitud');
+                }
+            });
+        }
+    </script>
+}
+
+<style>
+    .card {
+        cursor: pointer;
+        transition: transform 0.2s ease-in-out;
+    }
+
+    .card:hover {
+        transform: scale(1.05);
+    }
+</style>

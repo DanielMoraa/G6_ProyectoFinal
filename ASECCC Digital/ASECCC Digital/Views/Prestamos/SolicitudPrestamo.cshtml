@@ -1,0 +1,313 @@
+﻿@model ASECCC_Digital.Models.SolicitudPrestamoModel
+
+@{
+    Layout = "~/Views/Shared/_LayoutInterno.cshtml";
+}
+
+<div class="card mb-4 mt-4">
+    @if (ViewBag.Mensaje != null)
+    {
+        <div class="alert alert-warning text-center">
+            @ViewBag.Mensaje
+        </div>
+    }
+
+    <h4 class="card-header text-center">Solicitud de Préstamo</h4>
+
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-1"></div>
+            <div class="col-md-10">
+
+                <form id="FormSolicitudPrestamo" asp-action="SolicitudPrestamo" asp-controller="Prestamos" method="post">
+                    @Html.AntiForgeryToken()
+
+                    <!-- Sección Datos Personales -->
+                    <div class="form-section mb-4">
+                        <h5>Datos Personales</h5>
+
+                        <!-- Estado Civil -->
+                        <div class="form-group mb-3">
+                            <label>Estado Civil</label><br>
+                            <div class="form-check form-check-inline">
+                                <input type="radio" asp-for="EstadoCivil" value="Soltero"
+                                       class="form-check-input" id="estadoSoltero" required />
+                                <label class="form-check-label" for="estadoSoltero">Soltero</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input type="radio" asp-for="EstadoCivil" value="Casado"
+                                       class="form-check-input" id="estadoCasado" />
+                                <label class="form-check-label" for="estadoCasado">Casado</label>
+                            </div>
+                        </div>
+
+                        <!-- Paga alquiler -->
+                        <div class="form-group mb-3">
+                            <label>¿Paga Alquiler?</label><br>
+                            <div class="form-check form-check-inline">
+                                <input type="radio" asp-for="PagaAlquiler" value="true"
+                                       class="form-check-input" id="pagaAlquilerSi"
+                                       onclick="mostrarCampoAlquiler()" />
+                                <label class="form-check-label" for="pagaAlquilerSi">Sí</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input type="radio" asp-for="PagaAlquiler" value="false"
+                                       class="form-check-input" id="pagaAlquilerNo"
+                                       onclick="ocultarCampoAlquiler()" checked />
+                                <label class="form-check-label" for="pagaAlquilerNo">No</label>
+                            </div>
+                        </div>
+
+                        <!-- Monto de alquiler -->
+                        <div class="form-group mb-3" id="campoMontoAlquiler" style="display: none;">
+                            <label asp-for="MontoAlquiler">Monto de Alquiler</label>
+                            <input type="number" asp-for="MontoAlquiler" class="form-control"
+                                   placeholder="Ingrese el monto de alquiler" step="0.01" />
+                        </div>
+
+                        <!-- Tiene deudas -->
+                        <div class="form-group mb-3">
+                            <label>¿Tiene deudas?</label><br>
+                            <div class="form-check form-check-inline">
+                                <input type="radio" name="tieneDeudas" value="Si"
+                                       class="form-check-input" id="tieneDeudasSi"
+                                       onclick="mostrarCamposDeudas()" />
+                                <label class="form-check-label" for="tieneDeudasSi">Sí</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input type="radio" name="tieneDeudas" value="No"
+                                       class="form-check-input" id="tieneDeudasNo"
+                                       onclick="ocultarCamposDeudas()" checked />
+                                <label class="form-check-label" for="tieneDeudasNo">No</label>
+                            </div>
+                        </div>
+
+                        <!-- Campos de deudas -->
+                        <div id="camposDeudas" style="display: none;">
+                            <h6>Detalles de Deudas</h6>
+
+                            <div class="form-group mb-3">
+                                <label asp-for="NombreAcreedor">Nombre del Acreedor</label>
+                                <input type="text" asp-for="NombreAcreedor" class="form-control"
+                                       placeholder="Ingrese el nombre del acreedor" />
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label asp-for="TotalCredito">Total del Crédito</label>
+                                <input type="number" asp-for="TotalCredito" class="form-control"
+                                       placeholder="Ingrese el total del crédito" step="0.01" />
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label asp-for="AbonoSemanal">Abono Semanal</label>
+                                <input type="number" asp-for="AbonoSemanal" class="form-control"
+                                       placeholder="Ingrese el abono semanal" step="0.01" />
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label asp-for="SaldoCredito">Saldo del Crédito</label>
+                                <input type="number" asp-for="SaldoCredito" class="form-control"
+                                       placeholder="Ingrese el saldo del crédito" step="0.01" />
+                            </div>
+                        </div>
+
+                        <!-- Es fiador -->
+                        <div class="form-group mb-3">
+                            <label>¿Es fiador de algún préstamo?</label><br>
+                            <div class="form-check form-check-inline">
+                                <input type="radio" name="esFiador" value="Si"
+                                       class="form-check-input" id="esFiadorSi"
+                                       onclick="mostrarCamposFiador()" />
+                                <label class="form-check-label" for="esFiadorSi">Sí</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input type="radio" name="esFiador" value="No"
+                                       class="form-check-input" id="esFiadorNo"
+                                       onclick="ocultarCamposFiador()" checked />
+                                <label class="form-check-label" for="esFiadorNo">No</label>
+                            </div>
+                        </div>
+
+                        <!-- Campos de fiador -->
+                        <div id="camposFiador" style="display: none;">
+                            <h6>Detalles como Fiador</h6>
+
+                            <div class="form-group mb-3">
+                                <label asp-for="NombreDeudor">Nombre del Deudor</label>
+                                <input type="text" asp-for="NombreDeudor" class="form-control"
+                                       placeholder="Ingrese el nombre del deudor" />
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label asp-for="TotalPrestamo">Total del Préstamo</label>
+                                <input type="number" asp-for="TotalPrestamo" class="form-control"
+                                       placeholder="Ingrese el total del préstamo" step="0.01" />
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label asp-for="SaldoPrestamo">Saldo del Préstamo</label>
+                                <input type="number" asp-for="SaldoPrestamo" class="form-control"
+                                       placeholder="Ingrese el saldo del préstamo" step="0.01" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sección Detalles Préstamo -->
+                    <div class="form-section mb-4">
+                        <h5>Detalles del Préstamo</h5>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="TipoPrestamo">Tipo de Préstamo</label>
+                            <select asp-for="TipoPrestamo" class="form-control" id="tipoPrestamo"
+                                    required onchange="ajustarPlazo()">
+                                <option value="">Seleccione el tipo de préstamo</option>
+                                <option value="Personal">Personal</option>
+                                <option value="Urgente">Urgente</option>
+                                <option value="150%">150%</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="MontoSolicitud">Monto de Solicitud</label>
+                            <input type="number" asp-for="MontoSolicitud" class="form-control"
+                                   id="montoSolicitud" placeholder="Ingrese el monto a solicitar"
+                                   required step="0.01" />
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="PlazoMeses">Plazo en Meses</label>
+                            <input type="number" asp-for="PlazoMeses" class="form-control"
+                                   id="plazoMeses" placeholder="Ingrese el plazo en meses"
+                                   required min="1" max="99" />
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="CuotaSemanalSolicitud">Cuota Semanal Estimada</label>
+                            <input type="number" asp-for="CuotaSemanalSolicitud" class="form-control"
+                                   id="cuotaSemanal" placeholder="Cuota estimada" readonly />
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="PropositoPrestamo">Propósito del Préstamo</label>
+                            <textarea asp-for="PropositoPrestamo" class="form-control" rows="4"
+                                      placeholder="Escriba el propósito del préstamo" required></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Checkbox de aceptación -->
+                    <div class="form-check mb-4">
+                        <input class="form-check-input" type="checkbox" id="aceptoReglamento" required />
+                        <label class="form-check-label" for="aceptoReglamento">
+                            Acepto todas las disposiciones del reglamento de crédito
+                        </label>
+                    </div>
+
+                    <!-- Botón de Envío -->
+                    <div class="d-grid mt-4">
+                        <button type="submit" class="btn btn-primary">Enviar Solicitud</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        // Mostrar/ocultar campo de alquiler
+        function mostrarCampoAlquiler() {
+            document.getElementById('campoMontoAlquiler').style.display = 'block';
+        }
+
+        function ocultarCampoAlquiler() {
+            document.getElementById('campoMontoAlquiler').style.display = 'none';
+        }
+
+        // Mostrar/ocultar campos de deudas
+        function mostrarCamposDeudas() {
+            document.getElementById('camposDeudas').style.display = 'block';
+        }
+
+        function ocultarCamposDeudas() {
+            document.getElementById('camposDeudas').style.display = 'none';
+        }
+
+        // Mostrar/ocultar campos de fiador
+        function mostrarCamposFiador() {
+            document.getElementById('camposFiador').style.display = 'block';
+        }
+
+        function ocultarCamposFiador() {
+            document.getElementById('camposFiador').style.display = 'none';
+        }
+
+        // Ajustar plazo según tipo de préstamo
+        function ajustarPlazo() {
+            const tipo = document.getElementById('tipoPrestamo').value;
+            const plazoInput = document.getElementById('plazoMeses');
+
+            if (tipo === 'Urgente') {
+                plazoInput.max = 6;
+                if (parseInt(plazoInput.value) > 6) {
+                    plazoInput.value = 6;
+                }
+            } else {
+                plazoInput.max = 99;
+            }
+
+            calcularCuotaSemanal();
+        }
+
+        // Calcular cuota semanal
+        function calcularCuotaSemanal() {
+            const monto = parseFloat(document.getElementById('montoSolicitud').value) || 0;
+            const plazo = parseInt(document.getElementById('plazoMeses').value) || 0;
+
+            if (monto > 0 && plazo > 0) {
+                const interes = monto * 0.12;
+                const montoTotal = monto + interes;
+                const semanas = plazo * 4.34;
+                const cuota = (montoTotal / semanas).toFixed(2);
+                document.getElementById('cuotaSemanal').value = cuota;
+            } else {
+                document.getElementById('cuotaSemanal').value = '';
+            }
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('montoSolicitud').addEventListener('input', calcularCuotaSemanal);
+            document.getElementById('plazoMeses').addEventListener('input', calcularCuotaSemanal);
+
+            // Manejar envío del formulario
+            document.getElementById('FormSolicitudPrestamo').addEventListener('submit', function(e) {
+                const checkbox = document.getElementById('aceptoReglamento');
+                if (!checkbox.checked) {
+                    e.preventDefault();
+                    Swal.fire('Atención', 'Debe aceptar el reglamento para continuar', 'warning');
+                    return false;
+                }
+
+                // Remover readonly de cuota semanal para enviar el valor
+                document.getElementById('cuotaSemanal').removeAttribute('readonly');
+            });
+        });
+
+        // Mostrar mensaje de éxito si existe
+        @if (TempData["SuccessMessage"] != null)
+        {
+                <text>
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Éxito!',
+                    text: '@TempData["SuccessMessage"]',
+                    showConfirmButton: true
+                }).then(function() {
+                    window.location.href = '@Url.Action("ConsultaPrestamoAsociado", "Prestamos")';
+                });
+                </text>
+        }
+    </script>
+}
