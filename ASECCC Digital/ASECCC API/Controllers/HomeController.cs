@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.IdentityModel.Tokens;
 using System.ComponentModel.DataAnnotations;
+using System.Data;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Net.Mail;
@@ -42,8 +43,11 @@ namespace ASECCC_API.Controllers
                 parametros.Add("@FechaNacimiento", usuario.FechaNacimiento);
                 parametros.Add("@Telefono", usuario.Telefono);
                 parametros.Add("@Direccion", usuario.Direccion);
-
-                var resultado = context.Execute("Registro", parametros);
+                var resultado = context.QuerySingle<int>(
+                    "Registro",
+                    parametros,
+                    commandType: CommandType.StoredProcedure
+                );
                 return Ok(resultado);
             }
         }
@@ -91,7 +95,7 @@ namespace ASECCC_API.Controllers
                     var parametrosActualizar = new DynamicParameters();
                     parametrosActualizar.Add("@UsuarioId", resultado.UsuarioId);
                     parametrosActualizar.Add("@Contrasena", ContrasennaGenerada);
-                    var resultadoActualizar = context.Execute("ActualizarContrasenna", parametrosActualizar);
+                    var resultadoActualizar = context.Execute("ActualizarContrasena", parametrosActualizar);
 
                     if (resultadoActualizar > 0)
                     {
