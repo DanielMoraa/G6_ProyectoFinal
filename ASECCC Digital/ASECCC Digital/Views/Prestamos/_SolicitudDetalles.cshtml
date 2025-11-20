@@ -1,0 +1,106 @@
+﻿<!-- Modal para mostrar detalles de la solicitud -->
+<div class="modal fade" id="solicitudDetallesModal" tabindex="-1" aria-labelledby="solicitudDetallesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="solicitudDetallesModalLabel">Detalles de la Solicitud</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Campos ocultos -->
+                <input type="hidden" id="solicitud-id" />
+                <input type="hidden" id="usuario-id" />
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="text-muted mb-3">Información Personal</h6>
+                        <div class="mb-2">
+                            <strong>Nombre:</strong> <span id="nombreCompleto"></span>
+                        </div>
+                        <div class="mb-2">
+                            <strong>Estado Civil:</strong> <span id="estadoCivil"></span>
+                        </div>
+                        <div class="mb-2">
+                            <strong>Paga Alquiler:</strong> <span id="pagaAlquiler"></span>
+                        </div>
+                        <div class="mb-2">
+                            <strong>Monto Alquiler:</strong> <span id="montoAlquiler"></span>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <h6 class="text-muted mb-3">Información del Préstamo</h6>
+                        <div class="mb-2">
+                            <strong>Tipo de Préstamo:</strong> <span id="tipoPrestamoTexto"></span>
+                        </div>
+                        <div class="mb-2">
+                            <strong>Monto Solicitado:</strong> ₡<span id="montoSolicitud"></span>
+                        </div>
+                        <div class="mb-2">
+                            <strong>Plazo:</strong> <span id="plazoMeses"></span> meses
+                        </div>
+                        <div class="mb-2">
+                            <strong>Cuota Semanal:</strong> ₡<span id="cuotaSemanalSolicitud"></span>
+                        </div>
+                        <div class="mb-2">
+                            <strong>Estado:</strong> <span id="estadoTexto" class="badge"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <h6 class="text-muted mb-3">Propósito del Préstamo</h6>
+                        <p id="propositoPrestamo"></p>
+                    </div>
+                </div>
+
+                <div class="row mt-3" id="deudas-section" style="display: none;">
+                    <div class="col-12">
+                        <h6 class="text-muted mb-3">Información de Deudas</h6>
+                        <div class="mb-2">
+                            <strong>Acreedor:</strong> <span id="nombreAcreedor"></span>
+                        </div>
+                        <div class="mb-2">
+                            <strong>Total Crédito:</strong> ₡<span id="totalCredito"></span>
+                        </div>
+                        <div class="mb-2">
+                            <strong>Saldo:</strong> ₡<span id="saldoCredito"></span>
+                        </div>
+                        <div class="mb-2">
+                            <strong>Abono Semanal:</strong> ₡<span id="abonoSemanal"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-3" id="fiador-section" style="display: none;">
+                    <div class="col-12">
+                        <h6 class="text-muted mb-3">Información como Fiador</h6>
+                        <div class="mb-2">
+                            <strong>Deudor:</strong> <span id="nombreDeudor"></span>
+                        </div>
+                        <div class="mb-2">
+                            <strong>Total Préstamo:</strong> ₡<span id="totalPrestamo"></span>
+                        </div>
+                        <div class="mb-2">
+                            <strong>Saldo:</strong> ₡<span id="saldoPrestamo"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" id="btn-revisar" style="display: none;" onclick="cambiarEstado('En Revisión')">
+                    Mover a Revisión
+                </button>
+                <button type="button" class="btn btn-primary" id="btn-aprobar" style="display: none;" onclick="cambiarEstado('Aprobada')">
+                    Aprobar
+                </button>
+                <button type="button" class="btn btn-danger" id="btn-rechazar" style="display: none;" onclick="cambiarEstado('Rechazada')">
+                    Rechazar
+                </button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>

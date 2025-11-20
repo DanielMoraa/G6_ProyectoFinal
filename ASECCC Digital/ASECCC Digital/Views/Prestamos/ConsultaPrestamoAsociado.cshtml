@@ -1,0 +1,102 @@
+@model List<PrestamoModel>
+
+@{
+    ViewBag.Title = "ConsultaPrestamoAsociado";
+    Layout = "~/Views/Shared/_LayoutInterno.cshtml";
+}
+
+<div class="container my-5">
+    <div class="card mb-4 mt-4">
+        @if (ViewBag.Mensaje != null)
+        {
+            <div class="alert alert-info text-center">
+                @ViewBag.Mensaje
+            </div>
+        }
+
+        <h4 class="card-header text-center">Mis Préstamos</h4>
+
+        <div class="card-body">
+            @if (Model != null && Model.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Tipo</th>
+                                <th>Monto Aprobado</th>
+                                <th>Saldo Pendiente</th>
+                                <th>Cuota Semanal</th>
+                                <th>Plazo (meses)</th>
+                                <th>Estado</th>
+                                <th>Fecha Solicitud</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var prestamo in Model)
+                            {
+                                <tr>
+                                    <td>@prestamo.TipoPrestamo</td>
+                                    <td>₡@prestamo.MontoAprobado?.ToString("N2")</td>
+                                    <td>₡@prestamo.SaldoPendiente?.ToString("N2")</td>
+                                    <td>₡@prestamo.CuotaSemanal?.ToString("N2")</td>
+                                    <td>@prestamo.Plazo</td>
+                                    <td>
+                                        @if (prestamo.EstadoPrestamo == "Aprobado")
+                                        {
+                                            <span class="badge bg-success">@prestamo.EstadoPrestamo</span>
+                                        }
+                                        else if (prestamo.EstadoPrestamo == "Pagado")
+                                        {
+                                            <span class="badge bg-info">@prestamo.EstadoPrestamo</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-warning">@prestamo.EstadoPrestamo</span>
+                                        }
+                                    </td>
+                                    <td>@prestamo.FechaSolicitud?.ToString("dd/MM/yyyy")</td>
+                                    <td>
+                                        <a asp-action="DetallePrestamo" asp-route-prestamoId="@prestamo.PrestamoId" 
+                                           class="btn btn-sm btn-primary">
+                                            Ver Detalle
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <p class="text-center">No tiene préstamos registrados</p>
+            }
+
+            <div class="text-center mt-3">
+                <a asp-action="SolicitudPrestamo" class="btn btn-success">Nueva Solicitud</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <text>
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Éxito!',
+                    text: '@Html.Raw(TempData["SuccessMessage"])',
+                    showConfirmButton: true,
+                    confirmButtonText: 'Aceptar'
+                });
+                </text>
+            }
+        }); 
+    </script>
+}

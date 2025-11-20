@@ -1,0 +1,165 @@
+﻿@model EstadoCuentaModel
+
+@{
+    Layout = "~/Views/Shared/_LayoutInterno.cshtml";
+}
+
+<div class="pc-container">
+    <div class="pc-content">
+        <div class="page-header">
+            <div class="page-block">
+                <div class="row align-items-center">
+                    <div class="col-md-12">
+                        <div class="page-header-title">
+                            <h2 class="mb-0">Estado de Cuenta</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @if (Model?.Usuario != null)
+        {
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>Información del Usuario</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>Nombre:</strong> @Model.Usuario.NombreCompleto</p>
+                                    <p><strong>Identificación:</strong> @Model.Usuario.Identificacion</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong>Correo:</strong> @Model.Usuario.CorreoElectronico</p>
+                                    <p><strong>Teléfono:</strong> @Model.Usuario.Telefono</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    @if (Model.Prestamos != null && Model.Prestamos.Any())
+                    {
+                        <div class="card">
+                            <div class="card-header">
+                                <h5>Préstamos Activos</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Tipo</th>
+                                                <th>Monto Aprobado</th>
+                                                <th>Saldo Pendiente</th>
+                                                <th>Cuota Semanal</th>
+                                                <th>Estado</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var prestamo in Model.Prestamos)
+                                            {
+                                                <tr>
+                                                    <td>@prestamo.TipoPrestamo</td>
+                                                    <td>₡@(prestamo.MontoAprobado?.ToString("N2") ?? "0.00")</td>
+                                                    <td>₡@(prestamo.SaldoPendiente?.ToString("N2") ?? "0.00")</td>
+                                                    <td>₡@(prestamo.CuotaSemanal?.ToString("N2") ?? "0.00")</td>
+                                                    <td><span class="badge bg-success">@prestamo.EstadoPrestamo</span></td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                    @if (Model.Ahorros != null && Model.Ahorros.Any())
+                    {
+                        <div class="card">
+                            <div class="card-header">
+                                <h5>Cuentas de Ahorro</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Tipo</th>
+                                                <th>Monto Inicial</th>
+                                                <th>Monto Actual</th>
+                                                <th>Fecha Inicio</th>
+                                                <th>Estado</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var ahorro in Model.Ahorros)
+                                            {
+                                                <tr>
+                                                    <td>@ahorro.TipoAhorro</td>
+                                                    <td>₡@ahorro.MontoInicial.ToString("N2")</td>
+                                                    <td>₡@ahorro.MontoActual.ToString("N2")</td>
+                                                    <td>@ahorro.FechaInicio?.ToString("dd/MM/yyyy")</td>
+                                                    <td><span class="badge bg-success">@ahorro.Estado</span></td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                    @if (Model.Aportes != null && Model.Aportes.Any())
+                    {
+                        <div class="card">
+                            <div class="card-header">
+                                <h5>Aportes</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Tipo</th>
+                                                <th>Monto</th>
+                                                <th>Fecha Registro</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var aporte in Model.Aportes)
+                                            {
+                                                <tr>
+                                                    <td>@aporte.TipoAporte</td>
+                                                    <td>₡@aporte.Monto.ToString("N2")</td>
+                                                    <td>@aporte.FechaRegistro?.ToString("dd/MM/yyyy")</td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                    @if ((Model.Prestamos == null || !Model.Prestamos.Any()) &&
+                                    (Model.Ahorros == null || !Model.Ahorros.Any()) &&
+                                    (Model.Aportes == null || !Model.Aportes.Any()))
+                    {
+                        <div class="alert alert-info">
+                            <p class="mb-0">No hay información financiera disponible para este usuario.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-warning">
+                <p class="mb-0">No se pudo cargar la información del estado de cuenta.</p>
+            </div>
+        }
+    </div>
+</div>
