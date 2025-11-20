@@ -453,8 +453,7 @@ namespace ASECCC_API.Controllers
                             parametrosActualizar.Add("@NuevoEstado", "Aprobada");
 
                             var queryActualizar = @"UPDATE SolicitudesPrestamo 
-                                                   SET estadoSolicitud = @NuevoEstado,
-                                                       fechaAprobacion = GETDATE()
+                                                   SET estadoSolicitud = @NuevoEstado
                                                    WHERE solicitudPrestamoId = @SolicitudId";
 
                             context.Execute(queryActualizar, parametrosActualizar, transaction);
@@ -476,8 +475,7 @@ namespace ASECCC_API.Controllers
                             parametrosRechazar.Add("@NuevoEstado", "Rechazada");
 
                             var queryRechazar = @"UPDATE SolicitudesPrestamo 
-                                                 SET estadoSolicitud = @NuevoEstado,
-                                                     fechaRechazo = GETDATE()
+                                                 SET estadoSolicitud = @NuevoEstado
                                                  WHERE solicitudPrestamoId = @SolicitudId";
 
                             var resultado = context.Execute(queryRechazar, parametrosRechazar, transaction);
