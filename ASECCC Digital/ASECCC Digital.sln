@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ASECCC Digital", "ASECCC Di
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ASECCC API", "ASECCC API\ASECCC API.csproj", "{C2CD992B-6DFA-4543-845A-88F2F9FA13CC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Utiles", "Utiles\Utiles.csproj", "{C1A21C94-7309-4028-B1C8-5797A00AFE82}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{C2CD992B-6DFA-4543-845A-88F2F9FA13CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C2CD992B-6DFA-4543-845A-88F2F9FA13CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C2CD992B-6DFA-4543-845A-88F2F9FA13CC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C1A21C94-7309-4028-B1C8-5797A00AFE82}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C1A21C94-7309-4028-B1C8-5797A00AFE82}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C1A21C94-7309-4028-B1C8-5797A00AFE82}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C1A21C94-7309-4028-B1C8-5797A00AFE82}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
