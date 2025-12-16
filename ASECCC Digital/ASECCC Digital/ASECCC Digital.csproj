@@ -8,6 +8,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="Views\BeneficiosyServicios\Index.cshtml" />
+    <Content Remove="Views\ContactoySoporte\Confirmacion.cshtml" />
+    <Content Remove="Views\ContactoySoporte\Contacto.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="Views\BeneficiosyServicios\Index.cshtml" />
+    <Compile Include="Views\ContactoySoporte\Confirmacion.cshtml" />
+    <Compile Include="Views\ContactoySoporte\Contacto.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="wwwroot\lib\css\" />
   </ItemGroup>
 

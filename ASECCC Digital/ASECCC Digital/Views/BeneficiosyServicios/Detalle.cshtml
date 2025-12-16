@@ -1,0 +1,25 @@
+﻿@model ASECCC_Digital.Models.BeneficioServicioModel
+
+@{
+    ViewData["Title"] = "Detalle del Beneficio / Servicio";
+}
+
+<h2>@Model.Nombre</h2>
+
+<hr />
+
+<p><strong>Categoría:</strong> @Model.Categoria</p>
+
+<p>
+    <strong>Descripción:</strong><br />
+    @Model.Descripcion
+</p>
+
+<p>
+    <strong>Requisitos:</strong><br />
+    @Model.Requisitos
+</p>
+
+<a asp-action="Index" class="btn btn-secondary">
+    Volver
+</a>

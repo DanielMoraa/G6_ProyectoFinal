@@ -1,0 +1,42 @@
+﻿@model List<ASECCC_Digital.Models.BeneficioServicioModel>
+
+@{
+    ViewData["Title"] = "Beneficios y Servicios";
+}
+
+<h2>Beneficios y Servicios</h2>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">
+        No hay beneficios o servicios disponibles.
+    </div>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Categoría</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Nombre</td>
+                <td>@item.Categoria</td>
+                <td>
+                    <a class="btn btn-primary btn-sm"
+                       asp-action="Detalle"
+                       asp-route-id="@item.BeneficioId">
+                        Ver
+                    </a>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}

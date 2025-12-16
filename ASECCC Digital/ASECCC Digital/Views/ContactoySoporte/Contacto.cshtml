@@ -1,0 +1,40 @@
+﻿@model ASECCC_Digital.Models.ContactoSoporteVm
+@{
+    ViewData["Title"] = "Contacto";
+}
+
+<h2>Contacto</h2>
+
+<form asp-action="Contacto" method="post">
+    @Html.AntiForgeryToken()
+
+    <div class="mb-3">
+        <label asp-for="Nombre" class="form-label"></label>
+        <input asp-for="Nombre" class="form-control" />
+        <span asp-validation-for="Nombre" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Correo" class="form-label"></label>
+        <input asp-for="Correo" class="form-control" />
+        <span asp-validation-for="Correo" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Asunto" class="form-label"></label>
+        <input asp-for="Asunto" class="form-control" />
+        <span asp-validation-for="Asunto" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Mensaje" class="form-label"></label>
+        <textarea asp-for="Mensaje" class="form-control" rows="4"></textarea>
+        <span asp-validation-for="Mensaje" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Enviar</button>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
