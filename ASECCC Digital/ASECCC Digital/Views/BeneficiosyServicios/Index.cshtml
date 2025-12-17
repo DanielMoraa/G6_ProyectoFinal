@@ -6,7 +6,7 @@
 
 <h2>Beneficios y Servicios</h2>
 
-@if (!Model.Any())
+@if (Model == null || !Model.Any())
 {
     <div class="alert alert-info">
         No hay beneficios o servicios disponibles.
