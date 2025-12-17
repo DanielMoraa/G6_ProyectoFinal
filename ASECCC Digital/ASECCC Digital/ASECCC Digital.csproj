@@ -23,4 +23,8 @@
     <Folder Include="wwwroot\lib\css\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Utiles\Utiles.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -12,6 +12,7 @@ using System.Net.Mail;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using Utiles;
 
 namespace ASECCC_API.Controllers
 {
@@ -83,6 +84,7 @@ namespace ASECCC_API.Controllers
         {
             using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
             {
+                var helper = new Helper();
                 var parametros = new DynamicParameters();
                 parametros.Add("@CorreoElectronico", CorreoElectronico);
                 var resultado = context.QueryFirstOrDefault<DatosUsuarioResponseModel>("ValidarUsuario", parametros);
@@ -94,7 +96,7 @@ namespace ASECCC_API.Controllers
 
                     var parametrosActualizar = new DynamicParameters();
                     parametrosActualizar.Add("@UsuarioId", resultado.UsuarioId);
-                    parametrosActualizar.Add("@Contrasena", ContrasennaGenerada);
+                    parametrosActualizar.Add("@Contrasena", helper.Encrypt(ContrasennaGenerada));
                     var resultadoActualizar = context.Execute("ActualizarContrasena", parametrosActualizar);
 
                     if (resultadoActualizar > 0)
@@ -117,7 +119,7 @@ namespace ASECCC_API.Controllers
 
         private string GenerarContrasenna()
         {
-            int longitud = 8;
+            int longitud = 10;
             const string caracteres = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
             StringBuilder resultado = new();
 
