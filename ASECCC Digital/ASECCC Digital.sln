@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.14.36429.23
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ASECCC Digital", "ASECCC Digital\ASECCC Digital.csproj", "{17AB9579-ECF3-4E47-B5DE-1FF635646518}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ASECCC_Digital", "ASECCC Digital\ASECCC_Digital.csproj", "{17AB9579-ECF3-4E47-B5DE-1FF635646518}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ASECCC API", "ASECCC API\ASECCC API.csproj", "{C2CD992B-6DFA-4543-845A-88F2F9FA13CC}"
 EndProject

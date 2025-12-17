@@ -77,17 +77,18 @@ namespace ASECCC_API.Controllers
             using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
             {
                 var parametros = new DynamicParameters();
-                parametros.Add("BuscarNombre", usuario.BuscarNombre);
+                parametros.Add("@BuscarNombre", usuario.BuscarNombre);
 
-                var resultado = context.QueryFirstOrDefault<BuscarAsociadoResponseModel>(
+                var resultado = context.Query(
                     "BuscarAsociadoPorNombre",
                     parametros,
-                    commandType: System.Data.CommandType.StoredProcedure
+                    commandType: CommandType.StoredProcedure
                 );
 
-                return Ok(resultado);
+                return Ok(resultado); 
             }
         }
+
 
         [HttpPost]
         [Route("DesactivarAsociado")]

@@ -15,6 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ASECCC Digital\ASECCC_Digital.csproj" />
     <ProjectReference Include="..\Utiles\Utiles.csproj" />
   </ItemGroup>
 

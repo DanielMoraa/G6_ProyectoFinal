@@ -98,6 +98,47 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 
+@if (TempData["Success"] != null)
+{
+    <script>
+        Swal.fire({
+            icon: 'success',
+            title: '¡Éxito!',
+            text: '@TempData["Success"]',
+            confirmButtonColor: '#28a745',
+            confirmButtonText: 'Aceptar'
+        });
+    </script>
+}
+
+@if (TempData["Error"] != null)
+{
+    <script>
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: '@TempData["Error"]',
+            confirmButtonColor: '#dc3545',
+            confirmButtonText: 'Aceptar'
+        });
+    </script>
+}
+
+@if (TempData["Warning"] != null)
+{
+    <script>
+        Swal.fire({
+            icon: 'warning',
+            title: 'Atención',
+            text: '@TempData["Warning"]',
+            confirmButtonColor: '#ffc107',
+            confirmButtonText: 'Aceptar'
+        });
+    </script>
+}
+
+
+
 
 
 

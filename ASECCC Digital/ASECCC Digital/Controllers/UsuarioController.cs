@@ -1,6 +1,7 @@
 ﻿using ASECCC_Digital.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Http.Headers;
+using System.Text.Json;
 using Utiles;
 
 namespace ASECCC_Digital.Controllers
@@ -14,6 +15,12 @@ namespace ASECCC_Digital.Controllers
         {
             _http = http;
             _configuration = configuration;
+        }
+
+        public IActionResult Principal()
+        {
+
+            return View();
         }
 
         [HttpGet]
@@ -104,13 +111,20 @@ namespace ASECCC_Digital.Controllers
         }
 
         [HttpPost]
-        public IActionResult BuscarAsociado(UsuarioModel usuario)
+        public IActionResult BuscarAsociado([FromBody] UsuarioModel usuario)
         {
+            if (string.IsNullOrWhiteSpace(usuario.NombreCompleto))
+                return Json(new { success = false });
+
             using (var client = _http.CreateClient())
             {
                 var url = _configuration["Valores:UrlAPI"] + "Usuario/BuscarAsociado";
+
                 client.DefaultRequestHeaders.Authorization =
-                    new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("Token"));
+                    new AuthenticationHeaderValue(
+                        "Bearer",
+                        HttpContext.Session.GetString("Token")
+                    );
 
                 var payload = new
                 {
@@ -122,31 +136,33 @@ namespace ASECCC_Digital.Controllers
                 if (!respuesta.IsSuccessStatusCode)
                     return Json(new { success = false });
 
-                var datos = respuesta.Content.ReadFromJsonAsync<UsuarioModel>().Result;
+                var lista = respuesta.Content
+                    .ReadFromJsonAsync<List<AsociadoBusquedaViewModel>>()
+                    .Result;
 
-                if (datos == null || datos.UsuarioId == 0)
+                if (lista == null || lista.Count == 0)
                     return Json(new { success = false });
 
-                return Json(new
-                {
-                    success = true,
-                    id = datos.UsuarioId,
-                    nombre = datos.NombreCompleto,
-                    identificacion = datos.Identificacion,
-                    correo = datos.CorreoElectronico,
-                    telefono = datos.Telefono
-                });
+                return Json(new { success = true, data = lista });
             }
         }
 
+
         [HttpPost]
-        public IActionResult DesactivarAsociado(UsuarioModel usuario)
+        public IActionResult DesactivarAsociado([FromBody] UsuarioModel usuario)
         {
+            if (usuario.UsuarioId <= 0)
+                return Json(new { success = false, message = "Usuario inválido" });
+
             using (var client = _http.CreateClient())
             {
                 var url = _configuration["Valores:UrlAPI"] + "Usuario/DesactivarAsociado";
+
                 client.DefaultRequestHeaders.Authorization =
-                    new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("Token"));
+                    new AuthenticationHeaderValue(
+                        "Bearer",
+                        HttpContext.Session.GetString("Token")
+                    );
 
                 var payload = new
                 {
@@ -161,13 +177,12 @@ namespace ASECCC_Digital.Controllers
                 var resultado = respuesta.Content.ReadFromJsonAsync<int>().Result;
 
                 if (resultado > 0)
-                {
                     return Json(new { success = true, message = "Asociado desactivado correctamente" });
-                }
 
                 return Json(new { success = false, message = "No se pudo desactivar el asociado" });
             }
         }
+
 
         [HttpGet]
         public IActionResult LiquidarAsociado()
