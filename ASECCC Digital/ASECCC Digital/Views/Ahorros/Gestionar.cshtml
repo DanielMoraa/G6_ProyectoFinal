@@ -18,6 +18,7 @@
             </div>
 
             <div class="card-body">
+
                 <form method="get" class="row g-3 mb-3">
                     <div class="col-md-4">
                         <label class="form-label">Nombre del Asociado</label>
@@ -29,11 +30,10 @@
                     </div>
 
                     <div class="col-md-3">
-                        <label class="form-label">Tipo de horro</label>
+                        <label class="form-label">Tipo de ahorro</label>
                         <select class="form-select" name="tipoAhorroId">
                             <option value="">Todos</option>
 
-                            @* A la Vista *@
                             @if (qTipo == "1")
                             {
                                 <option value="1" selected>A la Vista</option>
@@ -43,17 +43,15 @@
                                 <option value="1">A la Vista</option>
                             }
 
-                            @* Navideño *@
                             @if (qTipo == "2")
                             {
-                                <option value="2" selected>Navideño</option>
+                                <option value="2" selected>Navideno</option>
                             }
                             else
                             {
-                                <option value="2">Navideño</option>
+                                <option value="2">Navideno</option>
                             }
 
-                            @* Marchamo *@
                             @if (qTipo == "3")
                             {
                                 <option value="3" selected>Marchamo</option>
@@ -63,7 +61,6 @@
                                 <option value="3">Marchamo</option>
                             }
 
-                            @* Escolar *@
                             @if (qTipo == "4")
                             {
                                 <option value="4" selected>Escolar</option>
@@ -112,11 +109,11 @@
                         <thead class="table-light">
                             <tr>
                                 <th>Asociado</th>
-                                <th>Tipo de Ahorro</th>
+                                <th>Tipo</th>
                                 <th>Monto Inicial</th>
                                 <th>Monto Actual</th>
                                 <th>Estado</th>
-                                <th>Acciones</th>
+                                <th style="width: 340px;">Acciones</th>
                             </tr>
                         </thead>
 
@@ -125,41 +122,33 @@
                             {
                                 foreach (var ahorro in Model)
                                 {
-                                    var badge = ahorro.Estado == "Activo"
-                                    ? "bg-success"
-                                    : "bg-secondary";
+                                    var badge = ahorro.Estado == "Activo" ? "bg-success" : "bg-secondary";
 
                                     <tr data-id="@ahorro.AhorroId">
                                         <td>@ahorro.NombreAsociado</td>
                                         <td>@ahorro.TipoAhorro</td>
                                         <td>₡@ahorro.MontoInicial.ToString("N2")</td>
                                         <td>₡@ahorro.MontoActual.ToString("N2")</td>
+                                        <td><span class="badge @badge">@ahorro.Estado</span></td>
                                         <td>
-                                            <span class="badge @badge">@ahorro.Estado</span>
-                                        </td>
-                                        <td>
-                                            <button type="button"
-                                                    class="btn btn-sm btn-outline-primary me-1"
+                                            <button type="button" class="btn btn-sm btn-outline-primary me-1"
                                                     onclick="verDetalle(@ahorro.AhorroId)">
                                                 Detalles
                                             </button>
 
-                                            <button type="button"
-                                                    class="btn btn-sm btn-outline-secondary me-1"
+                                            <button type="button" class="btn btn-sm btn-outline-secondary me-1"
                                                     onclick="verHistorial(@ahorro.AhorroId)">
                                                 Historial
                                             </button>
 
                                             @if (ahorro.Estado == "Activo")
                                             {
-                                                <button type="button"
-                                                        class="btn btn-sm btn-outline-warning me-1"
+                                                <button type="button" class="btn btn-sm btn-outline-warning me-1"
                                                         onclick="modificarMonto(@ahorro.AhorroId)">
-                                                    Modificar Monto
+                                                    Modificar
                                                 </button>
 
-                                                <button type="button"
-                                                        class="btn btn-sm btn-outline-danger"
+                                                <button type="button" class="btn btn-sm btn-outline-danger"
                                                         onclick="eliminarAhorro(@ahorro.AhorroId)">
                                                     Eliminar
                                                 </button>
@@ -176,9 +165,7 @@
                             else
                             {
                                 <tr>
-                                    <td colspan="6" class="text-center text-muted">
-                                        No hay registros
-                                    </td>
+                                    <td colspan="6" class="text-center text-muted">No hay registros</td>
                                 </tr>
                             }
                         </tbody>
@@ -187,10 +174,9 @@
 
                 @if (ViewBag.Error != null)
                 {
-                    <div class="alert alert-danger mt-3">
-                        @ViewBag.Error
-                    </div>
+                    <div class="alert alert-danger mt-3">@ViewBag.Error</div>
                 }
+
             </div>
         </div>
 
@@ -199,79 +185,92 @@
 
 @section Scripts {
     <script>
+        function asegurarLibs() {
+            if (typeof $ === "undefined") { alert("jQuery no cargo. Revisa _LayoutInterno."); return false; }
+            if (typeof Swal === "undefined") { alert("SweetAlert2 no cargo"); return false; }
+            return true;
+        }
+
         function verDetalle(idAhorro) {
-            $.get('@Url.Action("Detalle", "Ahorros")',
-                { ahorroId: idAhorro },
-                function (html) {
-                    Swal.fire({
-                        title: 'Detalle de Ahorro',
-                        html: html,
-                        width: '600px'
-                    });
+            if (!asegurarLibs()) return;
+
+            $.get('@Url.Action("Detalle", "Ahorros")', { ahorroId: idAhorro })
+                .done(function (html) {
+                    Swal.fire({ title: 'Detalle de Ahorro', html: html, width: 600 });
+                })
+                .fail(function () {
+                    Swal.fire('Error', 'No se pudo cargar el detalle', 'error');
                 });
         }
 
         function verHistorial(idAhorro) {
-            $.get('@Url.Action("Historial", "Ahorros")',
-                { ahorroId: idAhorro },
-                function (html) {
-                    Swal.fire({
-                        title: 'Historial de Transacciones',
-                        html: html,
-                        width: '800px'
-                    });
+            if (!asegurarLibs()) return;
+
+            $.get('@Url.Action("Historial", "Ahorros")', { ahorroId: idAhorro })
+                .done(function (html) {
+                    Swal.fire({ title: 'Historial de Transacciones', html: html, width: 900 });
+                })
+                .fail(function () {
+                    Swal.fire('Error', 'No se pudo cargar el historial', 'error');
                 });
         }
 
         function modificarMonto(idAhorro) {
+            if (!asegurarLibs()) return;
+
             Swal.fire({
                 title: 'Modificar Monto Inicial',
                 input: 'number',
                 inputLabel: 'Nuevo monto inicial',
-                inputAttributes: {
-                    min: 0,
-                    step: 0.01
-                },
+                inputAttributes: { min: 0, step: 0.01 },
                 showCancelButton: true,
                 confirmButtonText: 'Guardar',
                 cancelButtonText: 'Cancelar'
             }).then((result) => {
-                if (result.isConfirmed && result.value) {
-                    $.post('@Url.Action("ModificarMonto", "Ahorros")',
-                        { ahorroId: idAhorro, nuevoMonto: result.value },
-                        function (resp) {
-                            if (resp.exito) {
-                                Swal.fire('Guardado', 'El monto fue actualizado.', 'success')
-                                    .then(() => location.reload());
-                            } else {
-                                Swal.fire('Error', 'No se pudo actualizar el monto.', 'error');
-                            }
-                        });
-                }
+                if (!result.isConfirmed || !result.value) return;
+
+                $.post('@Url.Action("ModificarMonto", "Ahorros")',
+                    { ahorroId: idAhorro, nuevoMonto: result.value }
+                )
+                .done(function (resp) {
+                    if (resp && resp.exito) {
+                        Swal.fire('Guardado', 'El monto fue actualizado', 'success')
+                            .then(() => location.reload());
+                    } else {
+                        Swal.fire('Error', 'No se pudo actualizar el monto', 'error');
+                    }
+                })
+                .fail(function () {
+                    Swal.fire('Error', 'No se pudo actualizar el monto', 'error');
+                });
             });
         }
 
         function eliminarAhorro(idAhorro) {
+            if (!asegurarLibs()) return;
+
             Swal.fire({
-                title: '¿Eliminar ahorro?',
+                title: 'Eliminar ahorro?',
                 text: 'Esta accion no se puede deshacer.',
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonText: 'Si, eliminar',
                 cancelButtonText: 'Cancelar'
             }).then((result) => {
-                if (result.isConfirmed) {
-                    $.post('@Url.Action("Eliminar", "Ahorros")',
-                        { ahorroId: idAhorro },
-                        function (resp) {
-                            if (resp.exito) {
-                                Swal.fire('Eliminado', 'El ahorro fue eliminado.', 'success')
-                                    .then(() => location.reload());
-                            } else {
-                                Swal.fire('Error', 'No se pudo eliminar el ahorro.', 'error');
-                            }
-                        });
-                }
+                if (!result.isConfirmed) return;
+
+                $.post('@Url.Action("Eliminar", "Ahorros")', { ahorroId: idAhorro })
+                    .done(function (resp) {
+                        if (resp && resp.exito) {
+                            Swal.fire('Eliminado', 'El ahorro fue eliminado', 'success')
+                                .then(() => location.reload());
+                        } else {
+                            Swal.fire('Error', 'No se pudo eliminar el ahorro', 'error');
+                        }
+                    })
+                    .fail(function () {
+                        Swal.fire('Error', 'No se pudo eliminar el ahorro', 'error');
+                    });
             });
         }
     </script>

@@ -1,5 +1,9 @@
 ﻿using ASECCC_Digital.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Globalization;
+using System.Net.Http.Headers;
+using System.Text;
 using System.Text.Json;
 
 namespace ASECCC_Digital.Controllers
@@ -12,22 +16,29 @@ namespace ASECCC_Digital.Controllers
         public AhorrosController(IConfiguration config)
         {
             _urlApi = config["Valores:UrlAPI"] ?? string.Empty;
-            _jsonOptions = new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            };
+            _jsonOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
         }
 
-        // ============================
+        private HttpClient CrearClient()
+        {
+            var client = new HttpClient { BaseAddress = new Uri(_urlApi) };
+
+            var token = HttpContext.Session.GetString("Token");
+            if (!string.IsNullOrWhiteSpace(token))
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            return client;
+        }
+
         [HttpGet]
         public async Task<IActionResult> MisAhorros()
         {
-            int usuarioId = HttpContext.Session.GetInt32("UsuarioId") ?? 1;
-
+            int usuarioId = HttpContext.Session.GetInt32("UsuarioId") ?? 0;
             var lista = new List<AhorroViewModel>();
 
-            using var client = new HttpClient { BaseAddress = new Uri(_urlApi) };
-            var response = await client.GetAsync($"Ahorros/MisAhorros/{usuarioId}");
+            using var client = CrearClient();
+
+            var response = await client.GetAsync($"Ahorros/ObtenerAhorrosPorUsuario?usuarioId={usuarioId}");
 
             if (response.IsSuccessStatusCode)
             {
@@ -39,30 +50,74 @@ namespace ASECCC_Digital.Controllers
                 ViewBag.Error = "No se cargaron los ahorros";
             }
 
+            var respTipos = await client.GetAsync("Ahorros/ObtenerCatalogoTipoAhorro");
+            if (respTipos.IsSuccessStatusCode)
+            {
+                var jsonTipos = await respTipos.Content.ReadAsStringAsync();
+                var tipos = JsonSerializer.Deserialize<List<CatalogoTipoAhorroViewModel>>(jsonTipos, _jsonOptions) ?? new();
+
+                ViewBag.TiposAhorro = tipos.Select(x => new SelectListItem
+                {
+                    Value = x.TipoAhorroId.ToString(),
+                    Text = x.TipoAhorro
+                }).ToList();
+            }
+            else
+            {
+                ViewBag.TiposAhorro = new List<SelectListItem>();
+            }
+
             return View(lista);
         }
 
+        [HttpPost]
+        public async Task<IActionResult> CrearAhorro(int TipoAhorroId, decimal MontoInicial, int? Plazo)
+        {
+            int usuarioId = HttpContext.Session.GetInt32("UsuarioId") ?? 0;
+            if (usuarioId == 0)
+            {
+                TempData["Error"] = "Sesión inválida. Vuelve a iniciar sesión.";
+                return RedirectToAction("MisAhorros");
+            }
+
+            using var client = CrearClient();
+
+            var payload = new
+            {
+                UsuarioId = usuarioId,
+                TipoAhorroId = TipoAhorroId,
+                MontoInicial = MontoInicial,
+                Plazo = Plazo
+            };
+
+            var content = new StringContent(
+                JsonSerializer.Serialize(payload),
+                Encoding.UTF8,
+                "application/json"
+            );
+
+            var resp = await client.PostAsync("Ahorros/CrearAhorro", content);
+
+            if (!resp.IsSuccessStatusCode)
+                TempData["Error"] = "No se pudo crear el ahorro.";
+
+            return RedirectToAction("MisAhorros");
+        }
+
         [HttpGet]
-        public async Task<IActionResult> Gestionar(
-            string? nombreAsociado,
-            int? tipoAhorroId,
-            string? estado)
+        public async Task<IActionResult> Gestionar(string? nombreAsociado, int? tipoAhorroId, string? estado)
         {
             var lista = new List<AhorroViewModel>();
 
-            using var client = new HttpClient { BaseAddress = new Uri(_urlApi) };
+            var qs = new List<string>();
+            if (!string.IsNullOrWhiteSpace(nombreAsociado)) qs.Add($"nombreAsociado={Uri.EscapeDataString(nombreAsociado)}");
+            if (tipoAhorroId.HasValue) qs.Add($"tipoAhorroId={tipoAhorroId.Value}");
+            if (!string.IsNullOrWhiteSpace(estado)) qs.Add($"estado={Uri.EscapeDataString(estado)}");
 
-            string qsNombre = nombreAsociado ?? string.Empty;
-            string qsEstado = estado ?? string.Empty;
-            string qsTipo = tipoAhorroId?.ToString() ?? string.Empty;
+            var url = "Ahorros/ObtenerAhorrosAdmin" + (qs.Count > 0 ? "?" + string.Join("&", qs) : "");
 
-            string query =
-                $"Ahorros/Gestionar" +
-                $"?nombreAsociado={Uri.EscapeDataString(qsNombre)}" +
-                $"&tipoAhorroId={Uri.EscapeDataString(qsTipo)}" +
-                $"&estado={Uri.EscapeDataString(qsEstado)}";
-
-            var response = await client.GetAsync(query);
+            using var client = CrearClient();
+            var response = await client.GetAsync(url);
 
             if (response.IsSuccessStatusCode)
             {
@@ -71,7 +126,7 @@ namespace ASECCC_Digital.Controllers
             }
             else
             {
-                ViewBag.Error = "No se pudieron cargaron los ahorro administrador";
+                ViewBag.Error = "No se pudieron cargar los ahorros (admin).";
             }
 
             return View(lista);
@@ -80,9 +135,8 @@ namespace ASECCC_Digital.Controllers
         [HttpGet]
         public async Task<IActionResult> Detalle(int ahorroId)
         {
-            using var client = new HttpClient { BaseAddress = new Uri(_urlApi) };
-
-            var response = await client.GetAsync($"Ahorros/Detalle/{ahorroId}");
+            using var client = CrearClient();
+            var response = await client.GetAsync($"Ahorros/ObtenerDetalleAhorro?ahorroId={ahorroId}");
 
             if (!response.IsSuccessStatusCode)
                 return PartialView("_Error", "Error al cargar el detalle.");
@@ -90,45 +144,51 @@ namespace ASECCC_Digital.Controllers
             var json = await response.Content.ReadAsStringAsync();
             var model = JsonSerializer.Deserialize<AhorroViewModel>(json, _jsonOptions);
 
-            return PartialView("_DetalleAhorro", model);
+            return PartialView("DetalleAhorro", model);
         }
-
 
         [HttpGet]
         public async Task<IActionResult> Historial(int ahorroId)
         {
-            using var client = new HttpClient { BaseAddress = new Uri(_urlApi) };
-
-            var response = await client.GetAsync($"Ahorros/Historial/{ahorroId}");
+            using var client = CrearClient();
+            var response = await client.GetAsync($"Ahorros/ObtenerTransaccionesAhorro?ahorroId={ahorroId}");
 
             if (!response.IsSuccessStatusCode)
                 return PartialView("_Error", "Error al cargar el historial.");
 
             var json = await response.Content.ReadAsStringAsync();
-            var model = JsonSerializer.Deserialize<List<AhorroTransaccionViewModel>>(json, _jsonOptions);
+            var model = JsonSerializer.Deserialize<List<AhorroTransaccionViewModel>>(json, _jsonOptions) ?? new();
 
-            return PartialView("_HistorialAhorro", model);
+            return PartialView("HistorialAhorro", model);
         }
 
         [HttpPost]
-        public async Task<JsonResult> ModificarMonto(int ahorroId, decimal nuevoMonto)
+        public async Task<JsonResult> ModificarMonto(int ahorroId, string nuevoMonto)
         {
-            using var client = new HttpClient { BaseAddress = new Uri(_urlApi) };
-            var resp = await client.PutAsync(
-                $"Ahorros/ModificarMonto?ahorroId={ahorroId}&nuevoMonto={nuevoMonto}",
-                null);
+            using var client = CrearClient();
 
+            nuevoMonto = (nuevoMonto ?? "").Replace(",", ".");
+            if (!decimal.TryParse(nuevoMonto, NumberStyles.Any, CultureInfo.InvariantCulture, out var montoDecimal))
+                return Json(new { exito = false });
+
+            var montoUrl = montoDecimal.ToString(CultureInfo.InvariantCulture);
+
+            var resp = await client.PutAsync($"Ahorros/ModificarMontoAhorro?ahorroId={ahorroId}&nuevoMonto={montoUrl}", null);
             return Json(new { exito = resp.IsSuccessStatusCode });
         }
-
 
         [HttpPost]
         public async Task<JsonResult> Eliminar(int ahorroId)
         {
-            using var client = new HttpClient { BaseAddress = new Uri(_urlApi) };
-            var resp = await client.DeleteAsync($"Ahorros/Eliminar/{ahorroId}");
-
+            using var client = CrearClient();
+            var resp = await client.DeleteAsync($"Ahorros/EliminarAhorro?ahorroId={ahorroId}");
             return Json(new { exito = resp.IsSuccessStatusCode });
         }
+    }
+
+    public class CatalogoTipoAhorroViewModel
+    {
+        public int TipoAhorroId { get; set; }
+        public string TipoAhorro { get; set; } = "";
     }
 }

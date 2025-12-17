@@ -1,46 +1,93 @@
 ﻿using ASECCC_API.Models;
+using Dapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 
 namespace ASECCC_API.Controllers
 {
-    [ApiController]
+    [Authorize]
     [Route("api/[controller]")]
+    [ApiController]
     public class NotificacionesController : ControllerBase
     {
-        private readonly NotificacionModel _model;
+        private readonly IConfiguration _configuration;
 
-        public NotificacionesController(IConfiguration config)
+        public NotificacionesController(IConfiguration configuration)
         {
-            _model = new NotificacionModel(config);
+            _configuration = configuration;
         }
 
-        [HttpGet("Usuario/{usuarioId:int}")]
-        public async Task<ActionResult<List<NotificacionDto>>> Usuario(int usuarioId)
+        [HttpGet]
+        [Route("ObtenerNotificacionesPorUsuario")]
+        public IActionResult ObtenerNotificacionesPorUsuario(int usuarioId)
         {
-            var lista = await _model.ObtenerNotificacionesPorUsuarioAsync(usuarioId);
-            return Ok(lista);
+            using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
+            {
+                var parametros = new DynamicParameters();
+                parametros.Add("@UsuarioId", usuarioId);
+
+                var query = @"
+                    SELECT  notificacionId AS NotificacionId,
+                            usuarioId      AS UsuarioId,
+                            titulo         AS Titulo,
+                            mensaje        AS Mensaje,
+                            fecha          AS Fecha,
+                            leido          AS Leido
+                    FROM Notificaciones
+                    WHERE usuarioId = @UsuarioId
+                    ORDER BY fecha DESC";
+
+                var resultado = context.Query<NotificacionResponseModel>(query, parametros);
+                return Ok(resultado);
+            }
         }
 
-        [HttpPost("MarcarLeida/{notificacionId:int}")]
-        public async Task<ActionResult> MarcarLeida(int notificacionId)
+        [HttpPost]
+        [Route("MarcarLeida")]
+        public IActionResult MarcarLeida([FromBody] MarcarLeidaRequestModel request)
         {
-            var ok = await _model.MarcarLeidaAsync(notificacionId);
+            using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
+            {
+                var parametros = new DynamicParameters();
+                parametros.Add("@NotificacionId", request.NotificacionId);
 
-            if (!ok)
-                return NotFound();
+                var query = @"
+                    UPDATE Notificaciones
+                    SET leido = 1
+                    WHERE notificacionId = @NotificacionId";
 
-            return NoContent();
+                var filas = context.Execute(query, parametros);
+
+                if (filas <= 0)
+                    return NotFound(new { mensaje = "Notificación no encontrada" });
+
+                return Ok(new { mensaje = "Notificación marcada como leída" });
+            }
         }
 
-        [HttpPost("MarcarTodas/{usuarioId:int}")]
-        public async Task<ActionResult> MarcarTodas(int usuarioId)
+        [HttpPost]
+        [Route("MarcarTodasLeidas")]
+        public IActionResult MarcarTodasLeidas([FromBody] MarcarTodasLeidasRequestModel request)
         {
-            var ok = await _model.MarcarTodasLeidasAsync(usuarioId);
+            using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
+            {
+                var parametros = new DynamicParameters();
+                parametros.Add("@UsuarioId", request.UsuarioId);
 
-            if (!ok)
-                return NotFound();
+                var query = @"
+                    UPDATE Notificaciones
+                    SET leido = 1
+                    WHERE usuarioId = @UsuarioId
+                    AND leido = 0";
 
-            return NoContent();
+                var filas = context.Execute(query, parametros);
+
+                if (filas <= 0)
+                    return NotFound(new { mensaje = "No hay notificaciones pendientes o usuario no válido" });
+
+                return Ok(new { mensaje = "Todas las notificaciones fueron marcadas como leídas" });
+            }
         }
     }
 }

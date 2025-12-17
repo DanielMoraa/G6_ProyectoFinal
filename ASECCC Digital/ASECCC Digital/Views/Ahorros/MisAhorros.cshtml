@@ -1,4 +1,5 @@
-﻿@model IEnumerable<ASECCC_Digital.Models.AhorroViewModel>
+﻿@using Microsoft.AspNetCore.Mvc.Rendering
+@model IEnumerable<ASECCC_Digital.Models.AhorroViewModel>
 
 @{
     Layout = "_LayoutInterno";
@@ -9,8 +10,12 @@
     <div class="col-md-12">
 
         <div class="card shadow-sm mb-4">
-            <div class="card-header">
+            <div class="card-header d-flex align-items-center justify-content-between">
                 <h5 class="mb-0">Mis Ahorros</h5>
+
+                <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalNuevoAhorro">
+                    + Nuevo Ahorro
+                </button>
             </div>
 
             <div class="card-body">
@@ -64,6 +69,63 @@
                         @ViewBag.Error
                     </div>
                 }
+
+                @if (TempData["Error"] != null)
+                {
+                    <div class="alert alert-danger mt-3">
+                        @TempData["Error"]
+                    </div>
+                }
+
+                <div class="modal fade" id="modalNuevoAhorro" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+
+                            <form asp-controller="Ahorros" asp-action="CrearAhorro" method="post">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Crear Ahorro</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+
+                                <div class="modal-body">
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Tipo de ahorro</label>
+                                        <select class="form-select" name="TipoAhorroId" required>
+                                            <option value="">-- Seleccione --</option>
+
+                                            @if (ViewBag.TiposAhorro != null)
+                                            {
+                                                foreach (var t in (IEnumerable<SelectListItem>)ViewBag.TiposAhorro)
+                                                {
+                                                    <option value="@t.Value">@t.Text</option>
+                                                }
+                                            }
+                                        </select>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Monto inicial</label>
+                                        <input type="number" name="MontoInicial" class="form-control" min="1" step="0.01" required />
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Plazo (meses) (opcional)</label>
+                                        <input type="number" name="Plazo" class="form-control" min="1" />
+                                    </div>
+
+                                </div>
+
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+                                    <button type="submit" class="btn btn-primary">Crear</button>
+                                </div>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
 

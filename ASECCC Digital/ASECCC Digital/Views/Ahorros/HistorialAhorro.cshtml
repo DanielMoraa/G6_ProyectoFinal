@@ -1,34 +1,41 @@
 ﻿@model IEnumerable<ASECCC_Digital.Models.AhorroTransaccionViewModel>
 
-<table class="table table-sm table-striped mb-0">
-    <thead>
-        <tr>
-            <th>Fecha</th>
-            <th>Tipo</th>
-            <th>Monto</th>
-            <th>Descripción</th>
-        </tr>
-    </thead>
-    <tbody>
-        @if (Model != null && Model.Any())
-        {
-            foreach (var t in Model)
+<div class="table-responsive">
+    <table class="table table-sm table-striped align-middle mb-0">
+        <thead class="table-light">
+            <tr>
+                <th style="white-space:nowrap;">Fecha</th>
+                <th>Tipo</th>
+                <th style="white-space:nowrap;">Monto</th>
+                <th>Descripción</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @if (Model != null && Model.Any())
+            {
+                foreach (var t in Model)
+                {
+                    <tr>
+                        <td style="white-space:nowrap;">
+                            @t.Fecha.ToString("dd/MM/yyyy")
+                        </td>
+                        <td>@t.Tipo</td>
+                        <td style="white-space:nowrap;">
+                            ₡@t.Monto.ToString("N2")
+                        </td>
+                        <td>@(string.IsNullOrWhiteSpace(t.Descripcion) ? "-" : t.Descripcion)</td>
+                    </tr>
+                }
+            }
+            else
             {
                 <tr>
-                    <td>@t.Fecha.ToString("dd/MM/yyyy")</td>
-                    <td>@t.Tipo</td>
-                    <td>₡@t.Monto.ToString("N2")</td>
-                    <td>@t.Descripcion</td>
+                    <td colspan="4" class="text-center text-muted">
+                        No hay transacciones
+                    </td>
                 </tr>
             }
-        }
-        else
-        {
-            <tr>
-                <td colspan="4" class="text-center text-muted">
-                    No hay transacciones
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+        </tbody>
+    </table>
+</div>

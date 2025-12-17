@@ -1,132 +1,229 @@
-﻿using ASECCC_Digital.Models;
+﻿using ASECCC_API.Models;
+using Dapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Text.Json;
+using Microsoft.Data.SqlClient;
 
-namespace ASECCC_Digital.Controllers
+namespace ASECCC_API.Controllers
 {
-    public class AhorrosController : Controller
+    [Authorize]
+    [Route("api/[controller]")]
+    [ApiController]
+    public class AhorrosController : ControllerBase
     {
-        private readonly string _urlApi;
+        private readonly IConfiguration _configuration;
 
-        public AhorrosController(IConfiguration config)
+        public AhorrosController(IConfiguration configuration)
         {
-            _urlApi = config["Valores:UrlAPI"]!; // Ej: "https://localhost:7119/api/"
+            _configuration = configuration;
         }
 
 
         [HttpGet]
-        public async Task<IActionResult> MisAhorros()
+        [Route("ObtenerAhorrosPorUsuario")]
+        public IActionResult ObtenerAhorrosPorUsuario(int usuarioId)
         {
-            int usuarioId = 1;
-            var lista = new List<AhorroViewModel>();
+            using var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]);
 
-            using var client = new HttpClient { BaseAddress = new Uri(_urlApi) };
-            var response = await client.GetAsync($"Ahorros/MisAhorros/{usuarioId}");
+            var parametros = new DynamicParameters();
+            parametros.Add("@UsuarioId", usuarioId);
 
-            if (response.IsSuccessStatusCode)
-            {
-                var json = await response.Content.ReadAsStringAsync();
-                lista = JsonSerializer.Deserialize<List<AhorroViewModel>>(json,
-                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new();
-            }
-            else
-            {
-                ViewBag.Error = "No se pudieron cargar los ahorros";
-            }
+            var query = @"
+                SELECT  a.ahorroId      AS AhorroId,
+                        a.usuarioId     AS UsuarioId,
+                        a.tipoAhorroId  AS TipoAhorroId,
+                        c.tipoAhorro    AS TipoAhorro,
+                        a.montoInicial  AS MontoInicial,
+                        a.montoActual   AS MontoActual,
+                        a.fechaInicio   AS FechaInicio,
+                        a.plazo         AS Plazo,
+                        a.estado        AS Estado,
+                        ''              AS NombreAsociado,
+                        ''              AS Identificacion
+                FROM Ahorros a
+                INNER JOIN CatalogoTipoAhorro c ON a.tipoAhorroId = c.tipoAhorroId
+                WHERE a.usuarioId = @UsuarioId
+                ORDER BY a.fechaInicio DESC, a.ahorroId DESC;";
 
-            return View(lista);
+            var resultado = context.Query<AhorroResponseModel>(query, parametros);
+            return Ok(resultado);
         }
 
 
         [HttpGet]
-        public IActionResult Gestionar()
+        [Route("ObtenerAhorrosAdmin")]
+        public IActionResult ObtenerAhorrosAdmin(string? nombreAsociado, int? tipoAhorroId, string? estado)
         {
-            return View(new List<AhorroViewModel>());
+            using var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]);
+
+            var nombre = string.IsNullOrWhiteSpace(nombreAsociado) ? null : nombreAsociado;
+            var est = string.IsNullOrWhiteSpace(estado) ? null : estado;
+
+            var parametros = new DynamicParameters();
+            parametros.Add("@Nombre", nombre);
+            parametros.Add("@TipoAhorroId", tipoAhorroId);
+            parametros.Add("@Estado", est);
+
+            var query = @"
+                SELECT  a.ahorroId      AS AhorroId,
+                        a.usuarioId     AS UsuarioId,
+                        a.tipoAhorroId  AS TipoAhorroId,
+                        c.tipoAhorro    AS TipoAhorro,
+                        a.montoInicial  AS MontoInicial,
+                        a.montoActual   AS MontoActual,
+                        a.fechaInicio   AS FechaInicio,
+                        a.plazo         AS Plazo,
+                        a.estado        AS Estado,
+                        u.nombreCompleto AS NombreAsociado,
+                        u.identificacion AS Identificacion
+                FROM Ahorros a
+                INNER JOIN Usuario u ON a.usuarioId = u.usuarioId
+                INNER JOIN CatalogoTipoAhorro c ON a.tipoAhorroId = c.tipoAhorroId
+                WHERE   (@Nombre IS NULL OR u.nombreCompleto LIKE '%' + @Nombre + '%')
+                AND     (@TipoAhorroId IS NULL OR a.tipoAhorroId = @TipoAhorroId)
+                AND     (@Estado IS NULL OR a.estado = @Estado)
+                ORDER BY a.fechaInicio DESC, a.ahorroId DESC;";
+
+            var resultado = context.Query<AhorroResponseModel>(query, parametros);
+            return Ok(resultado);
         }
 
+
         [HttpGet]
-        public async Task<IActionResult> Gestionar(string? nombreAsociado, int? tipoAhorroId, string? estado)
+        [Route("ObtenerDetalleAhorro")]
+        public IActionResult ObtenerDetalleAhorro(int ahorroId)
         {
-            var lista = new List<AhorroViewModel>();
+            using var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]);
 
-            using var client = new HttpClient { BaseAddress = new Uri(_urlApi) };
+            var parametros = new DynamicParameters();
+            parametros.Add("@AhorroId", ahorroId);
 
-            string query =
-                $"Ahorros/Gestionar?nombreAsociado={nombreAsociado}&tipoAhorroId={tipoAhorroId}&estado={estado}";
+            var query = @"
+                SELECT  a.ahorroId      AS AhorroId,
+                        a.usuarioId     AS UsuarioId,
+                        a.tipoAhorroId  AS TipoAhorroId,
+                        c.tipoAhorro    AS TipoAhorro,
+                        a.montoInicial  AS MontoInicial,
+                        a.montoActual   AS MontoActual,
+                        a.fechaInicio   AS FechaInicio,
+                        a.plazo         AS Plazo,
+                        a.estado        AS Estado,
+                        u.nombreCompleto AS NombreAsociado,
+                        u.identificacion AS Identificacion
+                FROM Ahorros a
+                INNER JOIN Usuario u ON a.usuarioId = u.usuarioId
+                INNER JOIN CatalogoTipoAhorro c ON a.tipoAhorroId = c.tipoAhorroId
+                WHERE a.ahorroId = @AhorroId;";
 
-            var response = await client.GetAsync(query);
+            var resultado = context.QueryFirstOrDefault<AhorroResponseModel>(query, parametros);
 
-            if (response.IsSuccessStatusCode)
-            {
-                var json = await response.Content.ReadAsStringAsync();
-
-                lista = JsonSerializer.Deserialize<List<AhorroViewModel>>(json,
-                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new();
-            }
-            else
-            {
-                ViewBag.Error = "No se lograron cargar los datos.";
-            }
-
-            return View(lista);
+            if (resultado == null) return NotFound("No existe el ahorro.");
+            return Ok(resultado);
         }
 
-        [HttpGet]
-        public async Task<IActionResult> Detalle(int ahorroId)
-        {
-            using var client = new HttpClient { BaseAddress = new Uri(_urlApi) };
-
-            var response = await client.GetAsync($"Ahorros/Detalle/{ahorroId}");
-
-            if (!response.IsSuccessStatusCode)
-                return PartialView("_Error", "Error.");
-
-            var json = await response.Content.ReadAsStringAsync();
-
-            var model = JsonSerializer.Deserialize<AhorroViewModel>(json,
-                new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-
-            return PartialView("_DetalleAhorro", model);
-        }
 
         [HttpGet]
-        public async Task<IActionResult> Historial(int ahorroId)
+        [Route("ObtenerTransaccionesAhorro")]
+        public IActionResult ObtenerTransaccionesAhorro(int ahorroId)
         {
-            using var client = new HttpClient { BaseAddress = new Uri(_urlApi) };
+            using var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]);
 
-            var response = await client.GetAsync($"Ahorros/Historial/{ahorroId}");
+            var parametros = new DynamicParameters();
+            parametros.Add("@AhorroId", ahorroId);
 
-            if (!response.IsSuccessStatusCode)
-                return PartialView("_Error", "Error al cargar historial.");
+            var query = @"
+                SELECT  t.transaccionAhorroId AS TransaccionId,
+                        t.ahorroId           AS AhorroId,
+                        t.fechaTransaccion   AS Fecha,
+                        ct.tipoTransaccion   AS Tipo,
+                        t.monto              AS Monto,
+                        t.descripcion        AS Descripcion
+                FROM AhorroTransacciones t
+                INNER JOIN CatalogoTipoTransaccion ct ON t.tipoTransaccionId = ct.tipoTransaccionId
+                WHERE t.ahorroId = @AhorroId
+                ORDER BY t.fechaTransaccion DESC, t.transaccionAhorroId DESC;";
 
-            var json = await response.Content.ReadAsStringAsync();
-
-            var model = JsonSerializer.Deserialize<List<AhorroTransaccionViewModel>>(json,
-                new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-
-            return PartialView("_HistorialAhorro", model);
+            var resultado = context.Query<AhorroTransaccionResponseModel>(query, parametros);
+            return Ok(resultado);
         }
 
         [HttpPost]
-        public async Task<JsonResult> ModificarMonto(int ahorroId, decimal nuevoMonto)
+        [Route("CrearAhorro")]
+        public IActionResult CrearAhorro([FromBody] CrearAhorroRequest request)
         {
-            using var client = new HttpClient { BaseAddress = new Uri(_urlApi) };
+            using var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]);
 
-            var resp = await client.PutAsync(
-                $"Ahorros/ModificarMonto?ahorroId={ahorroId}&nuevoMonto={nuevoMonto}",
-                null);
+            var parametros = new DynamicParameters();
+            parametros.Add("@UsuarioId", request.UsuarioId);
+            parametros.Add("@TipoAhorroId", request.TipoAhorroId);
+            parametros.Add("@MontoInicial", request.MontoInicial);
+            parametros.Add("@Plazo", request.Plazo);
 
-            return Json(new { exito = resp.IsSuccessStatusCode });
+            var query = @"
+                INSERT INTO Ahorros
+                    (usuarioId, tipoAhorroId, montoInicial, montoActual, fechaInicio, plazo, estado)
+                VALUES
+                    (@UsuarioId, @TipoAhorroId, @MontoInicial, @MontoInicial, GETDATE(), @Plazo, 'Activo');
+
+                SELECT CAST(SCOPE_IDENTITY() AS INT);";
+
+            var nuevoId = context.QuerySingle<int>(query, parametros);
+            return Ok(nuevoId);
         }
 
-        [HttpPost]
-        public async Task<JsonResult> Eliminar(int ahorroId)
+        [HttpPut]
+        [Route("ModificarMontoAhorro")]
+        public IActionResult ModificarMontoAhorro(int ahorroId, decimal nuevoMonto)
         {
-            using var client = new HttpClient { BaseAddress = new Uri(_urlApi) };
+            using var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]);
 
-            var resp = await client.DeleteAsync($"Ahorros/Eliminar/{ahorroId}");
+            var parametros = new DynamicParameters();
+            parametros.Add("@AhorroId", ahorroId);
+            parametros.Add("@NuevoMonto", nuevoMonto);
 
-            return Json(new { exito = resp.IsSuccessStatusCode });
+            var query = @"
+                UPDATE Ahorros
+                SET montoInicial = @NuevoMonto
+                WHERE ahorroId = @AhorroId;";
+
+            var filas = context.Execute(query, parametros);
+            if (filas == 0) return NotFound("No existe el ahorro.");
+
+            return Ok(filas);
+        }
+
+        [HttpGet]
+        [Route("ObtenerCatalogoTipoAhorro")]
+        public IActionResult ObtenerCatalogoTipoAhorro()
+        {
+            using var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]);
+
+            var query = @"
+                SELECT  tipoAhorroId AS TipoAhorroId,
+                        tipoAhorro   AS TipoAhorro
+                FROM CatalogoTipoAhorro
+                ORDER BY tipoAhorro;";
+
+            var resultado = context.Query<CatalogoTipoAhorroResponseModel>(query);
+            return Ok(resultado);
+        }
+
+
+        [HttpDelete]
+        [Route("EliminarAhorro")]
+        public IActionResult EliminarAhorro(int ahorroId)
+        {
+            using var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]);
+
+            var parametros = new DynamicParameters();
+            parametros.Add("@AhorroId", ahorroId);
+
+            var query = @"DELETE FROM Ahorros WHERE ahorroId = @AhorroId;";
+
+            var filas = context.Execute(query, parametros);
+            if (filas == 0) return NotFound("No existe el ahorro.");
+
+            return Ok(filas);
         }
     }
 }
