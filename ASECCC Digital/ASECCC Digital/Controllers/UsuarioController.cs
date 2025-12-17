@@ -1,6 +1,7 @@
 ﻿using ASECCC_Digital.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Http.Headers;
+using Utiles;
 
 namespace ASECCC_Digital.Controllers
 {
@@ -78,6 +79,8 @@ namespace ASECCC_Digital.Controllers
 
             using (var context = _http.CreateClient())
             {
+                var helper = new Helper();
+                usuario.Contrasena = helper.Encrypt(usuario.Contrasena);
                 var urlApi = _configuration["Valores:UrlAPI"] + "Usuario/ActualizarSeguridad";
                 context.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("Token"));
                 var respuesta = context.PutAsJsonAsync(urlApi, usuario).Result;

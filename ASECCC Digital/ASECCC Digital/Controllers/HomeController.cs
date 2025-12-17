@@ -1,5 +1,7 @@
 using ASECCC_Digital.Models;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Cryptography;
+using Utiles;
 
 namespace ASECCC_Digital.Controllers
 {
@@ -24,6 +26,8 @@ namespace ASECCC_Digital.Controllers
         [HttpPost]
         public IActionResult Login(UsuarioModel usuario)
         {
+            var helper = new Helper();
+            usuario.Contrasena = helper.Encrypt(usuario.Contrasena);
             using (var context = _http.CreateClient())
             {
                 var urlApi = _configuration["Valores:UrlAPI"] + "Home/ValidarSesion";
@@ -38,6 +42,7 @@ namespace ASECCC_Digital.Controllers
                         HttpContext.Session.SetInt32("UsuarioId", datosApi.UsuarioId);
                         HttpContext.Session.SetString("NombreCompleto", datosApi.NombreCompleto);
                         HttpContext.Session.SetString("NombrePerfil", datosApi.NombrePerfil);
+                        HttpContext.Session.SetInt32("PerfilId", datosApi.PerfilId);
                         HttpContext.Session.SetString("Token", datosApi.Token);
                         return RedirectToAction("Principal", "Home");
                     }
@@ -63,6 +68,8 @@ namespace ASECCC_Digital.Controllers
         {
             try
             {
+                var helper = new Helper();
+                usuario.Contrasena = helper.Encrypt(usuario.Contrasena);
                 using (var context = _http.CreateClient())
                 {
                     var urlApi = _configuration["Valores:UrlAPI"] + "Home/Registro";
