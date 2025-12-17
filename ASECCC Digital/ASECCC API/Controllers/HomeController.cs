@@ -64,7 +64,12 @@ namespace ASECCC_API.Controllers
                 parametros.Add("@Identificacion", usuario.Identificacion);
                 parametros.Add("@Contrasena", usuario.Contrasena);
 
-                var resultado = context.QueryFirstOrDefault<DatosUsuarioResponseModel>("ValidarSesion", parametros);
+                var resultado = context.QueryFirstOrDefault<DatosUsuarioResponseModel>(
+                    "ValidarSesion",
+                    parametros,
+                    commandType: CommandType.StoredProcedure
+                );
+
 
                 if (resultado != null)
                 {
