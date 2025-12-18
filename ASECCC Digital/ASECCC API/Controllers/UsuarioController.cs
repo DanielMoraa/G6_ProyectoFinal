@@ -111,55 +111,97 @@ namespace ASECCC_API.Controllers
 
         [HttpPost]
         [Route("ObtenerRubrosLiquidacion")]
-        public IActionResult ObtenerRubrosLiquidacion(BuscarAsociadoLiquidacionRequestModel usuario)
+        public IActionResult ObtenerRubrosLiquidacion([FromBody] ObtenerRubrosLiquidacionRequestModel request)
         {
-            using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
+            using var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]);
+
+            var usuario = context.QueryFirstOrDefault<ObtenerRubrosLiquidacionRequestModel>(
+                "ObtenerUsuarioParaLiquidacion",
+                new { UsuarioId = request.UsuarioId },
+                commandType: CommandType.StoredProcedure
+            );
+
+            if (usuario == null)
+                return Ok(new { success = false, message = "Usuario no encontrado" });
+
+            
+            var rubros = context.Query<RubroLiquidacionResponseModel>(
+                "ObtenerRubrosActivosPorUsuario",
+                new { UsuarioId = request.UsuarioId },
+                commandType: CommandType.StoredProcedure
+            ).ToList();
+
+            usuario.Rubros = rubros;
+
+            return Ok(new
             {
-                var parametros = new DynamicParameters();
-                parametros.Add("BuscarNombre", usuario.BuscarNombre);
-
-                var resultado = context.QueryFirstOrDefault<ObtenerRubrosLiquidacionResponseModel>(
-                    "ObtenerRubrosParaLiquidacion",
-                    parametros,
-                    commandType: System.Data.CommandType.StoredProcedure
-                );
-
-                if (resultado == null)
-                {
-                    return Ok(new ObtenerRubrosLiquidacionResponseModel());
-                }
-                var rubros = context.Query<RubroLiquidacionResponseModel>(
-                    "ObtenerDetalleRubrosLiquidacion",
-                    new { UsuarioId = resultado.UsuarioId },
-                    commandType: System.Data.CommandType.StoredProcedure
-                ).ToList();
-
-                resultado.Rubros = rubros;
-
-                return Ok(resultado);
-            }
+                success = true,
+                usuario.UsuarioId,
+                usuario.NombreCompleto,
+                rubros
+            });
         }
+
+
+
 
         [HttpPost]
         [Route("LiquidarRubro")]
-        public IActionResult LiquidarRubro(LiquidarRubroRequestModel usuario)
+        public IActionResult LiquidarRubro([FromBody] LiquidarRubroRequestModel request)
         {
-            using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
+            using var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]);
+
+            var parametros = new DynamicParameters();
+            parametros.Add("@UsuarioId", request.UsuarioId);
+            parametros.Add("@TipoRubro", request.TipoRubro);
+            parametros.Add("@IdRubro", request.IdRubro);
+
+            var resultado = context.QueryFirstOrDefault<int>(
+                "LiquidarRubroAsociado",
+                parametros,
+                commandType: CommandType.StoredProcedure
+            );
+
+            return Ok(new
             {
-                var parametros = new DynamicParameters();
-                parametros.Add("UsuarioId", usuario.UsuarioId);
-                parametros.Add("TipoRubro", usuario.TipoRubro);
-                parametros.Add("IdRubro", usuario.IdRubro);
-
-                var resultado = context.QueryFirstOrDefault<int>(
-                    "LiquidarRubroAsociado",
-                    parametros,
-                    commandType: CommandType.StoredProcedure
-                );
-
-               
-                return Ok(new { filasAfectadas = resultado });
-            }
+                success = resultado > 0,
+                filasAfectadas = resultado
+            });
         }
+
+
+        [HttpPost]
+        [Route("ListarAsociadosAdmin")]
+        public IActionResult ListarAsociadosAdmin([FromBody] DataTableRequest request)
+        {
+            using var context =
+                new SqlConnection(_configuration["ConnectionStrings:BDConnection"]);
+
+            var parametros = new DynamicParameters();
+            parametros.Add("@Search", request.search?.value);
+            parametros.Add("@Start", request.start);
+            parametros.Add("@Length", request.length);
+
+            using var multi = context.QueryMultiple(
+                "ListarAsociadosAdmin",
+                parametros,
+                commandType: CommandType.StoredProcedure
+            );
+
+            var data = multi.Read().ToList();
+
+            var total = multi.ReadFirst<int>();
+
+            return Ok(new
+            {
+                draw = request.draw,
+                recordsTotal = total,
+                recordsFiltered = total,
+                data
+            });
+        }
+
+
+
     }
 }

@@ -8,13 +8,18 @@ function buscarAsociadoLiquidacion() {
         return;
     }
 
-    fetch("/Usuario/ObtenerRubrosLiquidacion", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ NombreCompleto: buscarNombre })
-    })
-        .then(r => r.json())
-        .then(data => {
+    document.addEventListener("DOMContentLoaded", () => {
+        const usuarioId = document.getElementById("UsuarioId").value;
+        cargarRubros(usuarioId);
+    });
+    function cargarRubros(usuarioId) {
+        fetch("/Usuario/ObtenerRubrosLiquidacion", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ UsuarioId: usuarioId })
+        })
+            .then(r => r.json())
+            .then(data => {
             if (data.success && data.rubros && data.rubros.length > 0) {
                 usuarioIdActual = data.usuarioId;
                 document.getElementById("nombreAsociado").textContent = data.nombreCompleto;
@@ -49,6 +54,7 @@ function buscarAsociadoLiquidacion() {
             console.error("Error:", error);
             Swal.fire("Error", "Ocurrió un error al buscar el asociado", "error");
         });
+    }
 }
 
 function liquidarRubro(tipo, descripcion, saldo, idRubro) {

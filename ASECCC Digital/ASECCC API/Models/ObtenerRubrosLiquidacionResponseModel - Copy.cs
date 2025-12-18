@@ -1,6 +1,6 @@
 ﻿namespace ASECCC_API.Models
 {
-    public class ObtenerRubrosLiquidacionResponseModel
+    public class ObtenerRubrosLiquidacionRequestModel
     {
         public int UsuarioId { get; set; }
         public string NombreCompleto { get; set; } = string.Empty;

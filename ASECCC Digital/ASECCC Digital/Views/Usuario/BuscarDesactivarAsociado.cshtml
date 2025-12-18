@@ -3,51 +3,83 @@
     Layout = "_LayoutInterno";
 }
 <div class="card mb-4 mt-4">
-    @if (ViewBag.Mensaje != null)
-    {
-        <div class="alert alert-primary text-center">
-            @ViewBag.Mensaje
-        </div>
-    }
-    <h4 class="card-header text-center">Buscar y Desactivar Asociado</h4>
+    <h4 class="card-header text-center">
+        Administración de Asociados
+    </h4>
     <div class="card-body">
-        <div class="row">
-            <div class="col-md-1"></div>
-            <div class="col-md-10">
-                <form id="FormBuscarAsociado">
-                    <div class="form-group mb-3">
-                        <label class="form-label">Buscar por Nombre</label>
-                        <input type="text"
-                               id="buscarNombre"
-                               class="form-control"
-                               placeholder="Ingrese el nombre del asociado"
-                               required />
-                    </div>
-                    <div class="d-grid mt-3">
-                        <button type="button" class="btn btn-primary" onclick="buscarAsociado()">Buscar</button>
-                    </div>
-                </form>
-                <div id="resultadosBusqueda" class="table-responsive mt-4" style="display:none;">
-                    <h5 class="text-center">Resultados de la Búsqueda</h5>
-                    <table class="table table-bordered mt-3">
-                        <thead class="table-dark">
-                            <tr>
-                                <th>Nombre Completo</th>
-                                <th>Identificación</th>
-                                <th>Correo</th>
-                                <th>Teléfono</th>
-                                <th>Acción</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tablaResultados"></tbody>
-                    </table>
-                </div>
-                <div id="sinResultados" class="text-center mt-3" style="display:none;">
-                    <p class="text-danger fw-bold">No se encontraron asociados.</p>
+        <div class="table-responsive">
+            <table id="tablaAsociados" class="table table-bordered w-100">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Nombre Completo</th>
+                        <th>Identificación</th>
+                        <th>Correo</th>
+                        <th>Teléfono</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalLiquidacion" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Liquidar rubros del asociado</h5>
+                <button class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="fw-bold text-center" id="nombreAsociadoModal"></p>
+                <table class="table table-bordered">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Tipo</th>
+                            <th>Descripción</th>
+                            <th>Saldo</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaRubrosModal"></tbody>
+                </table>
+                <div id="sinRubrosModal" class="text-center text-warning d-none">
+                    No hay rubros activos.
                 </div>
             </div>
         </div>
     </div>
 </div>
-<script src="~/js/Asociados.js" asp-append-version="true"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+@section Scripts {
+    <!-- DataTables -->
+    <link href="https://cdn.datatables.net/1.13.8/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.8/js/dataTables.bootstrap5.min.js"></script>
+    <script src="~/js/AsociadosAdmin.js" asp-append-version="true"></script>
+}
+<style>
+    .swal2-container {
+        z-index: 10000 !important;
+    }
+
+        .swal2-container.swal2-backdrop-show {
+            background: rgba(0, 0, 0, 0.6) !important;
+        }
+</style>
+<style>
+    /* DataTables styling */
+    table.dataTable thead th {
+        background: #111;
+        color: #fff;
+        border-bottom: none;
+    }
+
+    table.dataTable tbody tr:hover {
+        background-color: rgba(0, 0, 0, 0.03);
+    }
+
+    .dataTables_wrapper .btn {
+        padding: 4px 8px;
+    }
+</style>
