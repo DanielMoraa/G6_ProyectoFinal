@@ -99,7 +99,6 @@ namespace ASECCC_API.Controllers
                 parametros.Add("@PlazoMeses", solicitud.PlazoMeses);
                 parametros.Add("@PropositoPrestamo", solicitud.PropositoPrestamo);
 
-                // SP debe insertar y devolver el ID (SELECT CAST(SCOPE_IDENTITY() as int))
                 var resultado = context.QuerySingle<int>(
                     "CrearSolicitudPrestamo",
                     parametros,

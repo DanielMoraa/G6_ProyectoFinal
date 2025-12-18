@@ -106,5 +106,31 @@ namespace ASECCC_API.Controllers
 
             return Ok(new { mensaje = "OK", insertadas });
         }
+
+        [HttpPost("Crear")]
+        public IActionResult Crear([FromBody] CrearNotificacionRequestModel request)
+        {
+            if (request.UsuarioId <= 0) return BadRequest("UsuarioId requerido");
+            if (string.IsNullOrWhiteSpace(request.Titulo)) return BadRequest("Titulo requerido");
+            if (string.IsNullOrWhiteSpace(request.Contenido)) return BadRequest("Contenido requerido");
+
+            using var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]);
+
+            var p = new DynamicParameters();
+            p.Add("@UsuarioId", request.UsuarioId);
+            p.Add("@Titulo", request.Titulo.Trim());
+            p.Add("@Contenido", request.Contenido.Trim());
+            p.Add("@Tipo", string.IsNullOrWhiteSpace(request.Tipo) ? null : request.Tipo.Trim());
+
+            var resp = context.QuerySingle<dynamic>(
+                "dbo.CrearNotificacion",
+                p,
+                commandType: CommandType.StoredProcedure
+            );
+
+            int nuevoId = (int)resp.NuevoId;
+
+            return Ok(new { mensaje = "OK", notificacionId = nuevoId });
+        }
     }
 }
