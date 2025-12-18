@@ -390,6 +390,7 @@
     <!-- [ Main Content ] start -->
     <div class="pc-container">
         <div class="pc-content">
+            @await RenderSectionAsync("PageHeader", required: false)
             @RenderBody()
         </div>
     </div>

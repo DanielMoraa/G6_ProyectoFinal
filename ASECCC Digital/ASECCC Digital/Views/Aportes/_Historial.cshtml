@@ -1,0 +1,33 @@
+﻿@model IEnumerable<ASECCC_Digital.Models.AporteViewModel>
+
+<div class="table-responsive">
+    <table class="table table-sm table-striped align-middle mb-0">
+        <thead class="table-light">
+            <tr>
+                <th style="white-space:nowrap;">Fecha</th>
+                <th>Tipo</th>
+                <th style="white-space:nowrap;">Monto</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @if (Model != null && Model.Any())
+            {
+                foreach (var a in Model)
+                {
+                    <tr>
+                        <td style="white-space:nowrap;">@(a.FechaRegistro?.ToString("dd/MM/yyyy HH:mm") ?? "-")</td>
+                        <td>@a.TipoAporte</td>
+                        <td style="white-space:nowrap;">₡@a.Monto.ToString("N2")</td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="3" class="text-center text-muted">No hay aportes para mostrar.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

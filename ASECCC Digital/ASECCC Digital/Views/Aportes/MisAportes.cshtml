@@ -3,7 +3,11 @@
 @{
     Layout = "_LayoutInterno";
     ViewData["Title"] = "Mis Aportes";
+
+    var usuarioId = Context.Session.GetInt32("UsuarioId") ?? 1;
 }
+
+<input type="hidden" id="usuarioId" value="@usuarioId" />
 
 <div class="row">
     <div class="col-md-12">
@@ -16,10 +20,8 @@
                     <i class="ti ti-plus"></i> Nuevo Aporte
                 </button>
             </div>
-            <div class="card-body">
-                <p class="text-muted">
-                </p>
 
+            <div class="card-body">
                 <div class="table-responsive mt-3">
                     <table class="table table-striped align-middle mb-0">
                         <thead class="table-light">
@@ -38,16 +40,11 @@
                                     <tr>
                                         <td>@aporte.TipoAporte</td>
                                         <td>₡@aporte.Monto.ToString("N2")</td>
+                                        <td>@(aporte.FechaRegistro.HasValue? aporte.FechaRegistro.Value.ToString("dd/MM/yyyy") : "-")</td>
                                         <td>
-                                            @(aporte.FechaRegistro.HasValue
-                                                                                ? aporte.FechaRegistro.Value.ToString("dd/MM/yyyy")
-                                                                                : "-")
-                                        </td>
-                                        <td>
-                                            <button class="btn btn-sm btn-outline-primary me-1">
-                                                Detalles
-                                            </button>
-                                            <button class="btn btn-sm btn-outline-secondary">
+                                            <button type="button"
+                                                    class="btn btn-sm btn-outline-secondary"
+                                                    onclick="verHistorial('@aporte.TipoAporte')">
                                                 Historial
                                             </button>
                                         </td>
@@ -77,7 +74,7 @@
     </div>
 </div>
 
-<!-- MODAL DEl APORTE -->
+<!-- MODAL NUEVO APORTE -->
 <div class="modal fade" id="modalNuevoAporte" tabindex="-1" aria-labelledby="modalNuevoAporteLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -108,11 +105,6 @@
                                required />
                     </div>
 
-                    <div class="alert alert-info py-2">
-                        <small>
-                        </small>
-                    </div>
-
                     <div class="d-flex justify-content-end">
                         <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">
                             Cancelar
@@ -129,61 +121,68 @@
 
 @section Scripts {
     <script>
-        const apiBase = 'https://localhost:7119/api/';
-        const usuarioId = 1;
+        function asegurarLibs() {
+            if (typeof $ === "undefined") { alert(" no cargo"); return false; }
+            if (typeof Swal === "undefined") { alert("no cargo"); return false; }
+            return true;
+        }
+
+        function verHistorial(tipoAporte) {
+            if (!asegurarLibs()) return;
+
+            $.get('@Url.Action("Historial", "Aportes")', { tipoAporte: tipoAporte })
+                .done(function (html) {
+                    Swal.fire({
+                        title: 'Historial - ' + tipoAporte,
+                        html: html,
+                        width: 900
+                    });
+                })
+                .fail(function () {
+                    Swal.fire('Error', 'No se pudo cargar', 'error');
+                });
+        }
 
         document.addEventListener('DOMContentLoaded', function () {
-
             const form = document.getElementById('frmNuevoAporte');
             if (!form) return;
 
             form.addEventListener('submit', function (e) {
                 e.preventDefault();
 
-                const tipoSelect = document.getElementById('tipoAporteNuevo');
-                const montoInput = document.getElementById('montoAporteNuevo');
-
-                const tipoAporte = tipoSelect.value;
-                const monto = parseFloat(montoInput.value);
+                const usuarioId = parseInt(document.getElementById('usuarioId').value);
+                const tipoAporte = document.getElementById('tipoAporteNuevo').value;
+                const monto = parseFloat(document.getElementById('montoAporteNuevo').value);
 
                 if (!tipoAporte || isNaN(monto) || monto <= 0) {
                     alert('Complete correctamente los datos');
                     return;
                 }
 
-                const payload = {
-                    usuarioId: usuarioId,
-                    tipoAporte: tipoAporte,
-                    monto: monto
-                };
+                const payload = { usuarioId, tipoAporte, monto };
 
-                fetch(apiBase + 'Aportes', {
+                fetch('@Url.Action("CrearAporte", "Aportes")', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 })
-                    .then(resp => {
-                        if (!resp.ok) {
-                            throw new Error('Error en la respuesta del server');
-                        }
-                        return resp.text();
-                    })
-                    .then(() => {
-                        const modalEl = document.getElementById('modalNuevoAporte');
-                        const modalInstance = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
-                        modalInstance.hide();
+                .then(resp => {
+                    if (!resp.ok) return resp.text().then(t => { throw new Error(t || 'Error en el server'); });
+                    return resp.json();
+                })
+                .then(() => {
+                    const modalEl = document.getElementById('modalNuevoAporte');
+                    const modalInstance = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+                    modalInstance.hide();
 
-                        form.reset();
-                        window.location.reload();
-                    })
-                    .catch(err => {
-                        console.error(err);
-                        alert('un error al guardar el aporte');
-                    });
+                    form.reset();
+                    window.location.reload();
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert('Error al guardar el aporte');
+                });
             });
-
         });
     </script>
 }

@@ -11,8 +11,7 @@
 
     public class AporteAdminResponseModel : AporteResponseModel
     {
-        public string NombreCompleto { get; set; } = string.Empty;
-        public string Identificacion { get; set; } = string.Empty;
+        public string NombreAsociado { get; set; } = string.Empty;
     }
 
     public class CrearAporteRequestModel

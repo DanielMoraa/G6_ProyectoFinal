@@ -3,6 +3,7 @@ using Dapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
+using System.Data;
 
 namespace ASECCC_API.Controllers
 {
@@ -12,82 +13,98 @@ namespace ASECCC_API.Controllers
     public class NotificacionesController : ControllerBase
     {
         private readonly IConfiguration _configuration;
+        public NotificacionesController(IConfiguration configuration) => _configuration = configuration;
 
-        public NotificacionesController(IConfiguration configuration)
+        [HttpGet("MisNotificaciones/{usuarioId:int}")]
+        public IActionResult MisNotificaciones(int usuarioId)
         {
-            _configuration = configuration;
+            using var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]);
+
+            var p = new DynamicParameters();
+            p.Add("@UsuarioId", usuarioId);
+
+            var resultado = context.Query<NotificacionResponseModel>(
+                "dbo.ObtenerNotificacionesPorUsuario",
+                p,
+                commandType: CommandType.StoredProcedure
+            );
+
+            return Ok(resultado);
         }
 
-        [HttpGet]
-        [Route("ObtenerNotificacionesPorUsuario")]
-        public IActionResult ObtenerNotificacionesPorUsuario(int usuarioId)
-        {
-            using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
-            {
-                var parametros = new DynamicParameters();
-                parametros.Add("@UsuarioId", usuarioId);
-
-                var query = @"
-                    SELECT  notificacionId AS NotificacionId,
-                            usuarioId      AS UsuarioId,
-                            titulo         AS Titulo,
-                            mensaje        AS Mensaje,
-                            fecha          AS Fecha,
-                            leido          AS Leido
-                    FROM Notificaciones
-                    WHERE usuarioId = @UsuarioId
-                    ORDER BY fecha DESC";
-
-                var resultado = context.Query<NotificacionResponseModel>(query, parametros);
-                return Ok(resultado);
-            }
-        }
-
-        [HttpPost]
-        [Route("MarcarLeida")]
+        [HttpPost("MarcarLeida")]
         public IActionResult MarcarLeida([FromBody] MarcarLeidaRequestModel request)
         {
-            using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
-            {
-                var parametros = new DynamicParameters();
-                parametros.Add("@NotificacionId", request.NotificacionId);
+            using var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]);
 
-                var query = @"
-                    UPDATE Notificaciones
-                    SET leido = 1
-                    WHERE notificacionId = @NotificacionId";
+            var p = new DynamicParameters();
+            p.Add("@NotificacionId", request.NotificacionId);
 
-                var filas = context.Execute(query, parametros);
+            var resp = context.QuerySingle<dynamic>(
+                "dbo.MarcarNotificacionLeida",
+                p,
+                commandType: CommandType.StoredProcedure
+            );
 
-                if (filas <= 0)
-                    return NotFound(new { mensaje = "Notificación no encontrada" });
+            int filas = (int)resp.Filas;
+            if (filas <= 0) return NotFound(new { mensaje = "Notificacion no encontrada" });
 
-                return Ok(new { mensaje = "Notificación marcada como leída" });
-            }
+            return Ok(new { mensaje = "OK", filas });
         }
 
-        [HttpPost]
-        [Route("MarcarTodasLeidas")]
+        [HttpPost("MarcarTodasLeidas")]
         public IActionResult MarcarTodasLeidas([FromBody] MarcarTodasLeidasRequestModel request)
         {
-            using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
-            {
-                var parametros = new DynamicParameters();
-                parametros.Add("@UsuarioId", request.UsuarioId);
+            using var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]);
 
-                var query = @"
-                    UPDATE Notificaciones
-                    SET leido = 1
-                    WHERE usuarioId = @UsuarioId
-                    AND leido = 0";
+            var p = new DynamicParameters();
+            p.Add("@UsuarioId", request.UsuarioId);
 
-                var filas = context.Execute(query, parametros);
+            var resp = context.QuerySingle<dynamic>(
+                "dbo.MarcarTodasNotificacionesLeidas",
+                p,
+                commandType: CommandType.StoredProcedure
+            );
 
-                if (filas <= 0)
-                    return NotFound(new { mensaje = "No hay notificaciones pendientes o usuario no válido" });
+            int filas = (int)resp.Filas;
+            return Ok(new { mensaje = "OK", filas });
+        }
 
-                return Ok(new { mensaje = "Todas las notificaciones fueron marcadas como leídas" });
-            }
+        [HttpGet("AdminResumen")]
+        public IActionResult AdminResumen()
+        {
+            using var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]);
+
+            var resultado = context.Query<NotificacionAdminResumenResponseModel>(
+                "dbo.ObtenerNotificacionesAdminResumen",
+                commandType: CommandType.StoredProcedure
+            );
+
+            return Ok(resultado);
+        }
+
+        [HttpPost("CrearMasiva")]
+        public IActionResult CrearMasiva([FromBody] CrearNotificacionMasivaRequestModel request)
+        {
+            if (string.IsNullOrWhiteSpace(request.Destino)) return BadRequest("Destino requerido");
+            if (string.IsNullOrWhiteSpace(request.Titulo)) return BadRequest("Titulo requerido");
+            if (string.IsNullOrWhiteSpace(request.Contenido)) return BadRequest("Contenido requerido");
+
+            using var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]);
+
+            var p = new DynamicParameters();
+            p.Add("@Destino", request.Destino.Trim().ToLower());
+            p.Add("@Titulo", request.Titulo.Trim());
+            p.Add("@Contenido", request.Contenido.Trim());
+            p.Add("@Tipo", string.IsNullOrWhiteSpace(request.Tipo) ? "General" : request.Tipo.Trim());
+
+            int insertadas = context.QuerySingle<int>(
+                "dbo.CrearNotificacionMasiva",
+                p,
+                commandType: CommandType.StoredProcedure
+            );
+
+            return Ok(new { mensaje = "OK", insertadas });
         }
     }
 }

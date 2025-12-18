@@ -1,4 +1,6 @@
-﻿@{
+﻿@model IEnumerable<ASECCC_Digital.Models.NotificacionAdminResumenViewModel>
+
+@{
     Layout = "_LayoutInterno";
     ViewData["Title"] = "Notificaciones Admin";
 }
@@ -26,45 +28,60 @@
 <div class="row mb-3">
     <div class="col-md-12 text-end">
         <a asp-controller="Notificaciones" asp-action="Crear" class="btn btn-primary">
-            <i class="ti ti-plus"></i> Nueva Notificación
+            <i class="ti ti-plus"></i> Nueva Notificacion
         </a>
     </div>
 </div>
+
+@if (TempData["Ok"] != null)
+{
+    <div class="alert alert-success">@TempData["Ok"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+@if (ViewBag.Error != null)
+{
+    <div class="alert alert-danger">@ViewBag.Error</div>
+}
 
 <div class="row">
     <div class="col-md-12">
         <div class="card shadow-sm">
             <div class="card-body">
-
-                <table class="table table-striped align-middle">
-                    <thead>
-                        <tr>
-                            <th>Título</th>
-                            <th>Enviada a</th>
-                            <th>Fecha</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Recordatorio de aporte</td>
-                            <td>Usuarios activos</td>
-                            <td>10/11/2025</td>
-                        </tr>
-
-                        <tr>
-                            <td>Aviso general</td>
-                            <td>Todos los asociados</td>
-                            <td>03/11/2025</td>
-                        </tr>
-
-                        <tr>
-                            <td>Actualización de plataforma</td>
-                            <td>Administradores</td>
-                            <td>01/11/2025</td>
-                        </tr>
-                    </tbody>
-                </table>
-
+                <div class="table-responsive">
+                    <table class="table table-striped align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Titulo</th>
+                                <th>Enviada a</th>
+                                <th>Fecha</th>
+                                <th class="text-end">Cantidad</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model != null && Model.Any())
+                            {
+                                foreach (var n in Model)
+                                {
+                                    <tr>
+                                        <td>@n.Titulo</td>
+                                        <td>@n.EnviadaA</td>
+                                        <td>@(n.FechaEnvio.HasValue? n.FechaEnvio.Value.ToString("dd/MM/yyyy HH:mm") : "-")</td>
+                                        <td class="text-end">@n.Cantidad</td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="4" class="text-center text-muted">No hay notificaciones.</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
