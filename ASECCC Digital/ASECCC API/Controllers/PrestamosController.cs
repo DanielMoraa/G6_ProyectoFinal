@@ -1,4 +1,4 @@
-using ASECCC_API.Models;
+ï»¿using ASECCC_API.Models;
 using Dapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -28,13 +28,11 @@ namespace ASECCC_API.Controllers
             {
                 var parametros = new DynamicParameters();
                 parametros.Add("@UsuarioId", usuarioId);
-
-                var resultado = context.Query<PrestamoResponseModel>(
+                var resultado = context.Query<SolicitudPrestamoCompleta>(
                     "ObtenerPrestamosPorUsuario",
                     parametros,
                     commandType: CommandType.StoredProcedure
                 );
-
                 return Ok(resultado);
             }
         }
@@ -125,7 +123,7 @@ namespace ASECCC_API.Controllers
                 // El SP RegistrarAbonoPrestamo debe:
                 // - Insertar en PrestamosTransacciones
                 // - Actualizar Prestamos (saldoPendiente y estadoPrestamo)
-                // - Manejar la transacción internamente
+                // - Manejar la transacciÃ³n internamente
                 var resultado = context.Execute(
                     "RegistrarAbonoPrestamo",
                     parametros,
@@ -176,11 +174,11 @@ namespace ASECCC_API.Controllers
                         if (solicitudData == null)
                             return NotFound(new { mensaje = "Solicitud no encontrada" });
 
-                        // Verificar que la solicitud esté en estado Pendiente
+                        // Verificar que la solicitud estÃ© en estado Pendiente
                         if (solicitudData.EstadoSolicitud != "Pendiente")
                             return BadRequest(new { mensaje = $"La solicitud ya fue {solicitudData.EstadoSolicitud.ToLower()}" });
 
-                        // 2. Crear préstamo (SP CrearPrestamo debe insertar y devolver el ID)
+                        // 2. Crear prÃ©stamo (SP CrearPrestamo debe insertar y devolver el ID)
                         var parametrosPrestamo = new DynamicParameters();
                         parametrosPrestamo.Add("@UsuarioId", solicitudData.UsuarioId);
                         parametrosPrestamo.Add("@MontoAprobado", solicitudData.MontoSolicitud);
@@ -209,7 +207,7 @@ namespace ASECCC_API.Controllers
                         transaction.Commit();
                         return Ok(new
                         {
-                            mensaje = "Préstamo aprobado exitosamente",
+                            mensaje = "PrÃ©stamo aprobado exitosamente",
                             prestamoId = prestamoId,
                             montoAprobado = solicitudData.MontoSolicitud,
                             usuarioId = solicitudData.UsuarioId
@@ -218,7 +216,7 @@ namespace ASECCC_API.Controllers
                     catch (Exception ex)
                     {
                         transaction.Rollback();
-                        return BadRequest(new { mensaje = $"Error al aprobar el préstamo: {ex.Message}" });
+                        return BadRequest(new { mensaje = $"Error al aprobar el prÃ©stamo: {ex.Message}" });
                     }
                 }
             }
@@ -235,7 +233,7 @@ namespace ASECCC_API.Controllers
                 {
                     try
                     {
-                        // Verificar que la solicitud existe y está pendiente
+                        // Verificar que la solicitud existe y estÃ¡ pendiente
                         var parametrosVerificar = new DynamicParameters();
                         parametrosVerificar.Add("@SolicitudId", solicitud.SolicitudPrestamoId);
 
@@ -283,7 +281,7 @@ namespace ASECCC_API.Controllers
             {
                 // SP debe devolver las mismas columnas que tu SELECT original
                 var filas = context.Query<dynamic>(
-                    "ObtenerTodasSolicitudes",
+                    "ObtenerSolicitudesPrestamoTodas",
                     commandType: CommandType.StoredProcedure
                 );
 
@@ -317,9 +315,8 @@ namespace ASECCC_API.Controllers
                 var parametros = new DynamicParameters();
                 parametros.Add("@SolicitudId", solicitudId);
 
-                // SP ObtenerSolicitudPorId debe hacer el JOIN con Usuario
                 var resultado = context.QueryFirstOrDefault<dynamic>(
-                    "ObtenerSolicitudPorId",
+                    "ObtenerSolicitudPrestamoPorId",
                     parametros,
                     commandType: CommandType.StoredProcedure
                 );
@@ -333,7 +330,9 @@ namespace ASECCC_API.Controllers
                     UsuarioId = (int)resultado.usuarioId,
                     NombreCompleto = (string)resultado.nombreCompleto,
                     EstadoCivil = (string)resultado.estadoCivil,
-                    PagaAlquiler = resultado.pagaAlquiler ? "Si" : "No",
+
+                    PagaAlquiler = Convert.ToBoolean(resultado.pagaAlquiler),
+
                     MontoAlquiler = resultado.montoAlquiler != null ? (decimal?)resultado.montoAlquiler : null,
                     NombreAcreedor = resultado.nombreAcreedor != null ? (string)resultado.nombreAcreedor : null,
                     TotalCredito = resultado.totalCredito != null ? (decimal?)resultado.totalCredito : null,
@@ -352,6 +351,7 @@ namespace ASECCC_API.Controllers
                 });
             }
         }
+
 
         [HttpPost]
         [Route("CambiarEstadoSolicitud")]
@@ -389,7 +389,7 @@ namespace ASECCC_API.Controllers
                                 return BadRequest(new { success = false, message = "La solicitud ya fue aprobada" });
                             }
 
-                            // 2. Crear el préstamo
+                            // 2. Crear el prÃ©stamo
                             var parametrosPrestamo = new DynamicParameters();
                             parametrosPrestamo.Add("@UsuarioId", solicitudData.UsuarioId);
                             parametrosPrestamo.Add("@MontoAprobado", solicitudData.MontoSolicitud);
@@ -420,7 +420,7 @@ namespace ASECCC_API.Controllers
                             return Ok(new
                             {
                                 success = true,
-                                message = "Préstamo aprobado y creado exitosamente",
+                                message = "PrÃ©stamo aprobado y creado exitosamente",
                                 prestamoId = prestamoId,
                                 montoAprobado = solicitudData.MontoSolicitud
                             });
@@ -448,7 +448,7 @@ namespace ASECCC_API.Controllers
                         }
                         else
                         {
-                            // Otros estados: SP genérico
+                            
                             var parametros = new DynamicParameters();
                             parametros.Add("@SolicitudId", request.SolicitudPrestamoId);
                             parametros.Add("@NuevoEstado", request.NuevoEstado);

@@ -1,0 +1,73 @@
+﻿<div class="modal fade" id="solicitudDetallesAdminModal" tabindex="-1">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Revisión de Solicitud de Préstamo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+
+                <input type="hidden" id="solicitud-id" />
+                <input type="hidden" id="usuario-id" />
+
+                <h6 class="mb-3">Información del Asociado</h6>
+                <p><strong>Nombre:</strong> <span id="nombreCompleto"></span></p>
+                <p><strong>Estado Civil:</strong> <span id="estadoCivil"></span></p>
+                <p><strong>Alquiler:</strong> <span id="pagaAlquiler"></span></p>
+                <p><strong>Monto Alquiler:</strong> <span id="montoAlquiler"></span></p>
+
+                <hr />
+
+                <h6 class="mb-3">Información del Préstamo</h6>
+                <p><strong>Tipo:</strong> <span id="tipoPrestamoTexto"></span></p>
+                <p><strong>Monto:</strong> ₡<span id="montoSolicitud"></span></p>
+                <p><strong>Cuota Semanal:</strong> ₡<span id="cuotaSemanalSolicitud"></span></p>
+                <p><strong>Plazo:</strong> <span id="plazoMeses"></span> meses</p>
+                <p><strong>Propósito:</strong> <span id="propositoPrestamo"></span></p>
+                <p><strong>Estado:</strong> <span id="estadoTexto" class="badge"></span></p>
+
+                <div id="deudas-section" class="mt-3" style="display:none;">
+                    <hr />
+                    <h6>Deudas</h6>
+                    <p><strong>Acreedor:</strong> <span id="nombreAcreedor"></span></p>
+                    <p><strong>Total Crédito:</strong> ₡<span id="totalCredito"></span></p>
+                    <p><strong>Saldo:</strong> ₡<span id="saldoCredito"></span></p>
+                    <p><strong>Abono Semanal:</strong> ₡<span id="abonoSemanal"></span></p>
+                </div>
+
+                <div id="fiador-section" class="mt-3" style="display:none;">
+                    <hr />
+                    <h6>Fiador</h6>
+                    <p><strong>Nombre:</strong> <span id="nombreDeudor"></span></p>
+                    <p><strong>Total:</strong> ₡<span id="totalPrestamo"></span></p>
+                    <p><strong>Saldo:</strong> ₡<span id="saldoPrestamo"></span></p>
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+                <button id="btn-revisar" class="btn btn-info"
+                        onclick="cambiarEstado('En Revisión')">
+                    En Revisión
+                </button>
+
+                <button id="btn-aprobar" class="btn btn-success"
+                        onclick="cambiarEstado('Aprobada')">
+                    Aprobar
+                </button>
+
+                <button id="btn-rechazar" class="btn btn-danger"
+                        onclick="cambiarEstado('Rechazada')">
+                    Rechazar
+                </button>
+
+                <button class="btn btn-secondary" data-bs-dismiss="modal">
+                    Cerrar
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>

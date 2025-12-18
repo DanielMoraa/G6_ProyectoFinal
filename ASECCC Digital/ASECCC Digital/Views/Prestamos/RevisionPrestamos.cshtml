@@ -16,7 +16,7 @@
                 {
                     <div class="card mb-3 border-primary solicitud-card"
                          data-id="@solicitud.SolicitudPrestamoId"
-                         data-bs-toggle="modal" data-bs-target="#solicitudDetallesModal">
+                         data-bs-toggle="modal" data-bs-target="#solicitudDetallesAdminModal">
                         <div class="card-body">
                             <h6 class="card-title">Solicitud #@solicitud.SolicitudPrestamoId</h6>
                             <p class="card-text">
@@ -38,7 +38,7 @@
                 {
                     <div class="card mb-3 border-warning solicitud-card"
                          data-id="@solicitud.SolicitudPrestamoId"
-                         data-bs-toggle="modal" data-bs-target="#solicitudDetallesModal">
+                         data-bs-toggle="modal" data-bs-target="#solicitudDetallesAdminModal">
                         <div class="card-body">
                             <h6 class="card-title">Solicitud #@solicitud.SolicitudPrestamoId</h6>
                             <p class="card-text">
@@ -60,7 +60,7 @@
                 {
                     <div class="card mb-3 border-success solicitud-card"
                          data-id="@solicitud.SolicitudPrestamoId"
-                         data-bs-toggle="modal" data-bs-target="#solicitudDetallesModal">
+                         data-bs-toggle="modal" data-bs-target="#solicitudDetallesAdminModal">
                         <div class="card-body">
                             <h6 class="card-title">Solicitud #@solicitud.SolicitudPrestamoId</h6>
                             <p class="card-text">
@@ -82,7 +82,7 @@
                 {
                     <div class="card mb-3 border-danger solicitud-card"
                          data-id="@solicitud.SolicitudPrestamoId"
-                         data-bs-toggle="modal" data-bs-target="#solicitudDetallesModal">
+                         data-bs-toggle="modal" data-bs-target="#solicitudDetallesAdminModal">
                         <div class="card-body">
                             <h6 class="card-title">Solicitud #@solicitud.SolicitudPrestamoId</h6>
                             <p class="card-text">
@@ -99,7 +99,7 @@
 </div>
 
 <!-- Incluir el partial del modal -->
-<partial name="_SolicitudDetalles" />
+<partial name="_SolicitudDetallesAdmin" />
 
 @section Scripts {
     <script>

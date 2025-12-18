@@ -21,10 +21,13 @@ namespace ASECCC_Digital.Models
     public class EstadoCuentaModel
     {
         public UsuarioReporteModel? Usuario { get; set; }
-        public List<PrestamoReporteModel> Prestamos { get; set; } = new();
+
+        public List<SolicitudPrestamoEstadoCuentaModel> SolicitudesPrestamo { get; set; } = new();
+
         public List<AhorroReporteModel> Ahorros { get; set; } = new();
         public List<AporteReporteModel> Aportes { get; set; } = new();
     }
+
 
     public class UsuarioReporteModel
     {
@@ -36,14 +39,15 @@ namespace ASECCC_Digital.Models
         public DateTime? FechaIngreso { get; set; }
     }
 
-    public class PrestamoReporteModel
+    public class SolicitudPrestamoEstadoCuentaModel
     {
-        public int PrestamoId { get; set; }
+        public int SolicitudPrestamoId { get; set; }
         public string TipoPrestamo { get; set; } = string.Empty;
-        public decimal? MontoAprobado { get; set; }
-        public decimal? SaldoPendiente { get; set; }
-        public decimal? CuotaSemanal { get; set; }
-        public string EstadoPrestamo { get; set; } = string.Empty;
+        public decimal MontoSolicitud { get; set; }
+        public decimal CuotaSemanalSolicitud { get; set; }
+        public int PlazoMeses { get; set; }
+        public string EstadoSolicitud { get; set; } = string.Empty;
+        public DateTime FechaSolicitud { get; set; }
     }
 
     public class AhorroReporteModel

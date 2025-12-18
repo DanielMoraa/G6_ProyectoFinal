@@ -3,121 +3,115 @@
     Layout = "~/Views/Shared/_LayoutInterno.cshtml";
 }
 
-<section id="hero" class="hero section">
-    <div class="hero-background">
-        <img src="~/assets/img/wallpaper/wp3404276.jpg" alt="Fondo" class="img-fluid" />
-    </div>
-    <div class="container hero-content text-center text-black">
-        <h1 class="display-4">¡Bienvenidos a ASECCC Digital!</h1>
-        <p class="lead">Estamos comprometidos a brindarte lo mejor.</p>
+<!-- HEADER LIMPIO -->
+<section class="bg-light py-5 mb-4 border-bottom">
+    <div class="container text-center">
+        <h1 class="fw-bold mb-2">ASECCC Digital</h1>
+        <p class="text-muted mb-0">
+            Estamos comprometidos a brindarte lo mejor
+        </p>
     </div>
 </section>
 
-<div class="pc-container">
-    <div class="pc-content">
-        <div class="page-header">
-            <div class="page-block">
-                <div class="row align-items-center">
-                    <div class="col-md-12">
-                        <div class="page-header-title">
-                            <h2 class="mb-0">Resumen Financiero</h2>
-                        </div>
-                    </div>
-                </div>
-            </div>
+<div class="container">
+    <div class="row justify-content-start">
+
+        <!-- TÍTULO -->
+        <div class="mb-4">
+            <h2 class="fw-semibold">Resumen Financiero</h2>
+            <p class="text-muted mb-0">
+                Vista general de tu situación actual
+            </p>
         </div>
 
-        <div class="row">
-            <!-- Tarjeta: Total Préstamos -->
+        <div class="row g-4">
+
+            <!-- PRÉSTAMOS -->
             <div class="col-md-6 col-xl-4">
-                <div class="card bg-primary-dark dashnum-card text-white overflow-hidden">
-                    <span class="round small"></span>
-                    <span class="round big"></span>
+                <div class="card border-0 shadow-sm h-100">
                     <div class="card-body">
-                        <div class="row">
-                            <div class="col">
-                                <div class="avtar avtar-lg">
-                                    <i class="ti ti-coin text-white f-28"></i>
-                                </div>
+
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="rounded-circle bg-primary bg-opacity-10 p-3 me-3">
+                                <i class="ti ti-coin text-primary fs-4"></i>
                             </div>
-                            <div class="col-auto">
-                                <ul class="list-inline mb-0">
-                                    <li class="list-inline-item">Préstamos</li>
-                                    <li class="list-inline-item">
-                                        <h4 class="text-white mb-0">₡@Model.TotalPrestamos.ToString("N2")</h4>
-                                    </li>
-                                    <li class="list-inline-item">
-                                        <span class="badge bg-light-primary">@Model.CantidadPrestamos activos</span>
-                                    </li>
-                                </ul>
+                            <div>
+                                <h6 class="mb-0 text-muted">Préstamos</h6>
+                                <small class="text-muted">Activos</small>
                             </div>
                         </div>
+
+                        <h3 class="fw-bold text-primary mb-1">
+                            ₡@Model.TotalPrestamos.ToString("N2")
+                        </h3>
+
+                        <span class="badge bg-primary bg-opacity-10 text-primary">
+                            @Model.CantidadPrestamos activos
+                        </span>
                     </div>
                 </div>
             </div>
 
-            <!-- Tarjeta: Total Ahorros -->
+            <!-- AHORROS -->
             <div class="col-md-6 col-xl-4">
-                <div class="card bg-success-dark dashnum-card text-white overflow-hidden">
-                    <span class="round small"></span>
-                    <span class="round big"></span>
+                <div class="card border-0 shadow-sm h-100">
                     <div class="card-body">
-                        <div class="row">
-                            <div class="col">
-                                <div class="avtar avtar-lg">
-                                    <i class="ti ti-piggy-bank text-white f-28"></i>
-                                </div>
+
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="rounded-circle bg-success bg-opacity-10 p-3 me-3">
+                                <i class="ti ti-wallet text-success fs-4"></i>
                             </div>
-                            <div class="col-auto">
-                                <ul class="list-inline mb-0">
-                                    <li class="list-inline-item">Ahorros</li>
-                                    <li class="list-inline-item">
-                                        <h4 class="text-white mb-0">₡@Model.TotalAhorros.ToString("N2")</h4>
-                                    </li>
-                                    <li class="list-inline-item">
-                                        <span class="badge bg-light-success">@Model.CantidadAhorros cuentas</span>
-                                    </li>
-                                </ul>
+                            <div>
+                                <h6 class="mb-0 text-muted">Ahorros</h6>
+                                <small class="text-muted">Cuentas</small>
                             </div>
                         </div>
+
+                        <h3 class="fw-bold text-success mb-1">
+                            ₡@Model.TotalAhorros.ToString("N2")
+                        </h3>
+
+                        <span class="badge bg-success bg-opacity-10 text-success">
+                            @Model.CantidadAhorros cuentas
+                        </span>
                     </div>
                 </div>
             </div>
 
-            <!-- Tarjeta: Total Aportes -->
+            <!-- APORTES -->
             <div class="col-md-6 col-xl-4">
-                <div class="card bg-warning-dark dashnum-card text-white overflow-hidden">
-                    <span class="round small"></span>
-                    <span class="round big"></span>
+                <div class="card border-0 shadow-sm h-100">
                     <div class="card-body">
-                        <div class="row">
-                            <div class="col">
-                                <div class="avtar avtar-lg">
-                                    <i class="ti ti-wallet text-white f-28"></i>
-                                </div>
+
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="rounded-circle bg-warning bg-opacity-10 p-3 me-3">
+                                <i class="ti ti-wallet text-warning fs-4"></i>
                             </div>
-                            <div class="col-auto">
-                                <ul class="list-inline mb-0">
-                                    <li class="list-inline-item">Aportes</li>
-                                    <li class="list-inline-item">
-                                        <h4 class="text-white mb-0">₡@Model.TotalAportes.ToString("N2")</h4>
-                                    </li>
-                                    <li class="list-inline-item">
-                                        <span class="badge bg-light-warning">@Model.CantidadAportes registros</span>
-                                    </li>
-                                </ul>
+                            <div>
+                                <h6 class="mb-0 text-muted">Aportes</h6>
+                                <small class="text-muted">Registros</small>
                             </div>
                         </div>
+
+                        <h3 class="fw-bold text-warning mb-1">
+                            ₡@Model.TotalAportes.ToString("N2")
+                        </h3>
+
+                        <span class="badge bg-warning bg-opacity-10 text-warning">
+                            @Model.CantidadAportes registros
+                        </span>
                     </div>
                 </div>
             </div>
+
         </div>
 
         @if (ViewBag.Mensaje != null)
         {
-            <div class="alert alert-info">
+            <div class="alert alert-info mt-4">
                 @ViewBag.Mensaje
             </div>
         }
+
     </div>
 </div>

@@ -1,8 +1,8 @@
-@model List<PrestamoModel>
+@model List<SolicitudPrestamoCompletaModel>
 
 @{
     ViewBag.Title = "ConsultaPrestamoAsociado";
-    Layout = "~/Views/Shared/_LayoutInterno.cshtml";
+    Layout = "_LayoutInterno";
 }
 
 <div class="container my-5">
@@ -14,7 +14,7 @@
             </div>
         }
 
-        <h4 class="card-header text-center">Mis Préstamos</h4>
+        <h4 class="card-header text-center">Mis Solicitudes de Préstamo</h4>
 
         <div class="card-body">
             @if (Model != null && Model.Any())
@@ -24,44 +24,49 @@
                         <thead class="table-dark">
                             <tr>
                                 <th>Tipo</th>
-                                <th>Monto Aprobado</th>
-                                <th>Saldo Pendiente</th>
+                                <th>Monto Solicitado</th>
                                 <th>Cuota Semanal</th>
                                 <th>Plazo (meses)</th>
+                                <th>Propósito</th>
                                 <th>Estado</th>
                                 <th>Fecha Solicitud</th>
                                 <th>Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (var prestamo in Model)
+                            @foreach (var solicitud in Model)
                             {
                                 <tr>
-                                    <td>@prestamo.TipoPrestamo</td>
-                                    <td>₡@prestamo.MontoAprobado?.ToString("N2")</td>
-                                    <td>₡@prestamo.SaldoPendiente?.ToString("N2")</td>
-                                    <td>₡@prestamo.CuotaSemanal?.ToString("N2")</td>
-                                    <td>@prestamo.Plazo</td>
+                                    <td>@solicitud.TipoPrestamo</td>
+                                    <td>₡@solicitud.MontoSolicitud.ToString("N2")</td>
+                                    <td>₡@solicitud.CuotaSemanalSolicitud.ToString("N2")</td>
+                                    <td>@solicitud.PlazoMeses</td>
+                                    <td>@solicitud.PropositoPrestamo</td>
                                     <td>
-                                        @if (prestamo.EstadoPrestamo == "Aprobado")
+                                        @if (solicitud.EstadoSolicitud == "Aprobada")
                                         {
-                                            <span class="badge bg-success">@prestamo.EstadoPrestamo</span>
+                                            <span class="badge bg-success">@solicitud.EstadoSolicitud</span>
                                         }
-                                        else if (prestamo.EstadoPrestamo == "Pagado")
+                                        else if (solicitud.EstadoSolicitud == "Rechazada")
                                         {
-                                            <span class="badge bg-info">@prestamo.EstadoPrestamo</span>
+                                            <span class="badge bg-danger">@solicitud.EstadoSolicitud</span>
+                                        }
+                                        else if (solicitud.EstadoSolicitud == "Pendiente")
+                                        {
+                                            <span class="badge bg-warning">@solicitud.EstadoSolicitud</span>
                                         }
                                         else
                                         {
-                                            <span class="badge bg-warning">@prestamo.EstadoPrestamo</span>
+                                            <span class="badge bg-secondary">@solicitud.EstadoSolicitud</span>
                                         }
                                     </td>
-                                    <td>@prestamo.FechaSolicitud?.ToString("dd/MM/yyyy")</td>
+                                    <td>@solicitud.FechaSolicitud.ToString("dd/MM/yyyy")</td>
                                     <td>
-                                        <a asp-action="DetallePrestamo" asp-route-prestamoId="@prestamo.PrestamoId" 
-                                           class="btn btn-sm btn-primary">
+                                        <button class="btn btn-sm btn-primary"
+                                                onclick="verDetalleSolicitud(@solicitud.SolicitudPrestamoId)">
                                             Ver Detalle
-                                        </a>
+                                        </button>
+
                                     </td>
                                 </tr>
                             }
@@ -71,7 +76,7 @@
             }
             else
             {
-                <p class="text-center">No tiene préstamos registrados</p>
+                <p class="text-center">No tiene solicitudes de préstamo registradas</p>
             }
 
             <div class="text-center mt-3">
@@ -83,20 +88,24 @@
 
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="~/js/verDetalleSolicitud.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             @if (TempData["SuccessMessage"] != null)
             {
-                <text>
-                Swal.fire({
-                    icon: 'success',
-                    title: '¡Éxito!',
-                    text: '@Html.Raw(TempData["SuccessMessage"])',
-                    showConfirmButton: true,
-                    confirmButtonText: 'Aceptar'
-                });
-                </text>
+                    <text>
+                    Swal.fire({
+                        icon: 'success',
+                        title: '¡Éxito!',
+                        text: '@Html.Raw(TempData["SuccessMessage"])',
+                        showConfirmButton: true,
+                        confirmButtonText: 'Aceptar'
+                    });
+                    </text>
             }
-        }); 
+        });
     </script>
+    @await Html.PartialAsync("_SolicitudDetalles")
+
+
 }

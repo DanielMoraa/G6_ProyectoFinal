@@ -74,7 +74,7 @@ namespace ASECCC_Digital.Models
         public int UsuarioId { get; set; }
         public string NombreCompleto { get; set; } = string.Empty;
         public string EstadoCivil { get; set; } = string.Empty;
-        public string PagaAlquiler { get; set; } = string.Empty;
+        public bool PagaAlquiler { get; set; }
         public decimal? MontoAlquiler { get; set; }
         public string? NombreAcreedor { get; set; }
         public decimal? TotalCredito { get; set; }
@@ -91,5 +91,5 @@ namespace ASECCC_Digital.Models
         public string PropositoPrestamo { get; set; } = string.Empty;
         public DateTime FechaSolicitud { get; set; }
     }
-    
+
 }

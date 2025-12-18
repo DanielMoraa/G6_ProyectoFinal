@@ -1,0 +1,63 @@
+﻿@model List<SolicitudPrestamoListaModel>
+
+@{
+    Layout = "_LayoutInterno";
+    ViewData["Title"] = "Gestión de Solicitudes de Préstamo";
+}
+
+<h2 class="mb-4">Gestión de Solicitudes Pendientes</h2>
+
+@if (ViewBag.Mensaje != null)
+{
+    <div class="alert alert-warning">
+        @ViewBag.Mensaje
+    </div>
+}
+
+@if (Model != null && Model.Any())
+{
+    <table class="table table-bordered table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>ID Solicitud</th>
+                <th>ID Usuario</th>
+                <th>Nombre Completo</th>
+                <th>Tipo Préstamo</th>
+                <th>Monto Solicitado</th>
+                <th>Plazo (Meses)</th>
+                <th>Fecha Solicitud</th>
+                <th>Estado</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.SolicitudPrestamoId</td>
+                    <td>@item.UsuarioId</td>
+                    <td>@item.NombreCompleto</td>
+                    <td>@item.TipoPrestamo</td>
+                    <td>@item.MontoSolicitud.ToString("C")</td>
+                    <td>@item.PlazoMeses</td>
+                    <td>
+                        @(item.FechaSolicitud.HasValue
+                                        ? item.FechaSolicitud.Value.ToString("dd/MM/yyyy")
+                                        : "—")
+            </td>
+            <td>
+                <span class="badge
+                        @(item.EstadoSolicitud == "Pendiente" ? "bg-warning text-dark" : "bg-secondary")">
+                    @item.EstadoSolicitud
+                </span>
+            </td>
+        </tr>
+                }
+        </tbody>
+    </table>
+}
+else
+{
+    <div class="alert alert-info">
+        No hay solicitudes pendientes para mostrar.
+    </div>
+}

@@ -71,7 +71,6 @@ namespace ASECCC_Digital.Controllers
         public IActionResult ConsultaPrestamoAsociado()
         {
             var usuarioId = HttpContext.Session.GetInt32("UsuarioId");
-
             using (var client = _http.CreateClient())
             {
                 var url = _configuration["Valores:UrlAPI"] + "Prestamos/ObtenerPrestamosPorUsuario?usuarioId=" + usuarioId;
@@ -82,50 +81,59 @@ namespace ASECCC_Digital.Controllers
 
                 if (respuesta.IsSuccessStatusCode)
                 {
-                    var prestamos = respuesta.Content.ReadFromJsonAsync<List<PrestamoModel>>().Result;
-                    return View(prestamos ?? new List<PrestamoModel>());
+                    // ?? AQUÍ ESTABA EL ERROR - Cambia PrestamoModel por SolicitudPrestamoCompletaModel
+                    var solicitudes = respuesta.Content.ReadFromJsonAsync<List<SolicitudPrestamoCompletaModel>>().Result;
+                    return View(solicitudes ?? new List<SolicitudPrestamoCompletaModel>());
                 }
 
-                ViewBag.Mensaje = "No se encontraron préstamos";
-                return View(new List<PrestamoModel>());
+                ViewBag.Mensaje = "No se encontraron solicitudes de préstamo";
+                return View(new List<SolicitudPrestamoCompletaModel>());
             }
         }
 
         [HttpGet]
-        public IActionResult DetallePrestamo(int prestamoId)
+        public async Task<IActionResult> DetallePrestamo(int prestamoId)
         {
-            using (var client = _http.CreateClient())
+            using var client = _http.CreateClient();
+
+            client.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("Token"));
+
+            var url = _configuration["Valores:UrlAPI"] +
+                      $"Prestamos/ObtenerDetallePrestamo?prestamoId={prestamoId}";
+
+            var respuesta = await client.GetAsync(url);
+
+            if (!respuesta.IsSuccessStatusCode)
             {
-                var url = _configuration["Valores:UrlAPI"] + "Prestamos/ObtenerDetallePrestamo?prestamoId=" + prestamoId;
-                client.DefaultRequestHeaders.Authorization =
-                    new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("Token"));
-
-                var respuesta = client.GetAsync(url).Result;
-
-                if (respuesta.IsSuccessStatusCode)
-                {
-                    var prestamo = respuesta.Content.ReadFromJsonAsync<PrestamoDetalleModel>().Result;
-
-                    if (prestamo != null)
-                    {
-                        // Obtener transacciones
-                        var urlTransacciones = _configuration["Valores:UrlAPI"] + "Prestamos/ObtenerTransaccionesPrestamo?prestamoId=" + prestamoId;
-                        var respuestaTransacciones = client.GetAsync(urlTransacciones).Result;
-
-                        if (respuestaTransacciones.IsSuccessStatusCode)
-                        {
-                            prestamo.Transacciones = respuestaTransacciones.Content
-                                .ReadFromJsonAsync<List<PrestamoTransaccionModel>>().Result ?? new List<PrestamoTransaccionModel>();
-                        }
-
-                        return View(prestamo);
-                    }
-                }
-
                 ViewBag.Mensaje = "No se encontró el préstamo";
                 return RedirectToAction("ConsultaPrestamoAsociado");
             }
+
+            var prestamo = await respuesta.Content.ReadFromJsonAsync<PrestamoDetalleModel>();
+
+            if (prestamo == null)
+            {
+                ViewBag.Mensaje = "No se encontró el préstamo";
+                return RedirectToAction("ConsultaPrestamoAsociado");
+            }
+
+            var urlTransacciones = _configuration["Valores:UrlAPI"] +
+                                   $"Prestamos/ObtenerTransaccionesPrestamo?prestamoId={prestamoId}";
+
+            var respuestaTransacciones = await client.GetAsync(urlTransacciones);
+
+            if (respuestaTransacciones.IsSuccessStatusCode)
+            {
+                prestamo.Transacciones =
+                    await respuestaTransacciones.Content
+                        .ReadFromJsonAsync<List<PrestamoTransaccionModel>>()
+                    ?? new List<PrestamoTransaccionModel>();
+            }
+
+            return View(prestamo);
         }
+
 
         [HttpPost]
         public IActionResult RegistrarAbono(AbonoPrestamoModel abono)
@@ -292,5 +300,28 @@ namespace ASECCC_Digital.Controllers
                 return Json(new { success = false, message = "Error al actualizar el estado" });
             }
         }
+
+        [HttpGet]
+        public async Task<IActionResult> ObtenerSolicitudDetalleAjax(int solicitudId)
+        {
+            using var client = _http.CreateClient();
+
+            client.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("Token"));
+
+            var url = _configuration["Valores:UrlAPI"] +
+                      $"Prestamos/ObtenerSolicitudPorId?solicitudId={solicitudId}";
+
+            var respuesta = await client.GetAsync(url);
+
+            if (!respuesta.IsSuccessStatusCode)
+                return BadRequest();
+
+            var solicitud = await respuesta.Content
+                .ReadFromJsonAsync<SolicitudPrestamoCompletaModel>();
+
+            return Json(solicitud);
+        }
+
     }
 }

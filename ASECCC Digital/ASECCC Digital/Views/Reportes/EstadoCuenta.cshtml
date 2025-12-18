@@ -4,7 +4,7 @@
     Layout = "~/Views/Shared/_LayoutInterno.cshtml";
 }
 
-<div class="pc-container">
+<div class="container">
     <div class="pc-content">
         <div class="page-header">
             <div class="page-block">
@@ -40,41 +40,53 @@
                         </div>
                     </div>
 
-                    @if (Model.Prestamos != null && Model.Prestamos.Any())
+                    @if (Model.SolicitudesPrestamo != null && Model.SolicitudesPrestamo.Any())
                     {
-                        <div class="card">
-                            <div class="card-header">
-                                <h5>Préstamos Activos</h5>
+                        <div class="card border-0 shadow-sm mb-4">
+                            <div class="card-header bg-white">
+                                <h5 class="mb-0">Solicitudes de Préstamo</h5>
                             </div>
+
                             <div class="card-body">
                                 <div class="table-responsive">
-                                    <table class="table table-hover">
-                                        <thead>
+                                    <table class="table align-middle table-hover">
+                                        <thead class="table-light">
                                             <tr>
                                                 <th>Tipo</th>
-                                                <th>Monto Aprobado</th>
-                                                <th>Saldo Pendiente</th>
+                                                <th>Monto</th>
                                                 <th>Cuota Semanal</th>
+                                                <th>Plazo</th>
                                                 <th>Estado</th>
+                                                <th>Fecha</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach (var prestamo in Model.Prestamos)
+                                            @foreach (var sp in Model.SolicitudesPrestamo)
                                             {
                                                 <tr>
-                                                    <td>@prestamo.TipoPrestamo</td>
-                                                    <td>₡@(prestamo.MontoAprobado?.ToString("N2") ?? "0.00")</td>
-                                                    <td>₡@(prestamo.SaldoPendiente?.ToString("N2") ?? "0.00")</td>
-                                                    <td>₡@(prestamo.CuotaSemanal?.ToString("N2") ?? "0.00")</td>
-                                                    <td><span class="badge bg-success">@prestamo.EstadoPrestamo</span></td>
-                                                </tr>
-                                            }
+                                                    <td>@sp.TipoPrestamo</td>
+                                                    <td>₡@sp.MontoSolicitud.ToString("N2")</td>
+                                                    <td>₡@sp.CuotaSemanalSolicitud.ToString("N2")</td>
+                                                    <td>@sp.PlazoMeses meses</td>
+                                                    <td>
+                                                        <span class="badge
+                                                    @(sp.EstadoSolicitud == "Aprobada" ? "bg-success" :
+                                                                                                        sp.EstadoSolicitud == "Rechazada" ? "bg-danger" :
+                                                                                                        sp.EstadoSolicitud == "En Revisión" ? "bg-warning text-dark" :
+                                                                                                        "bg-secondary")">
+                                                @sp.EstadoSolicitud
+                                            </span>
+                                        </td>
+                                        <td>@sp.FechaSolicitud.ToString("dd/MM/yyyy")</td>
+                                    </tr>
+                                                                        }
                                         </tbody>
                                     </table>
                                 </div>
                             </div>
                         </div>
                     }
+
 
                     @if (Model.Ahorros != null && Model.Ahorros.Any())
                     {
@@ -144,14 +156,6 @@
                         </div>
                     }
 
-                    @if ((Model.Prestamos == null || !Model.Prestamos.Any()) &&
-                                    (Model.Ahorros == null || !Model.Ahorros.Any()) &&
-                                    (Model.Aportes == null || !Model.Aportes.Any()))
-                    {
-                        <div class="alert alert-info">
-                            <p class="mb-0">No hay información financiera disponible para este usuario.</p>
-                        </div>
-                    }
                 </div>
             </div>
         }

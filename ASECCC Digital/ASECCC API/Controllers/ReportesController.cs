@@ -86,11 +86,12 @@ namespace ASECCC_API.Controllers
                     return NotFound();
 
                 // Préstamos
-                var prestamos = context.Query<dynamic>(
-                    "ObtenerPrestamosEstadoCuenta",
-                    new { UsuarioId = usuarioId },
-                    commandType: CommandType.StoredProcedure
-                );
+                var solicitudesPrestamo = context.Query<dynamic>(
+    "ObtenerPrestamosPorUsuario",
+    new { UsuarioId = usuarioId },
+    commandType: CommandType.StoredProcedure
+);
+
 
                 // Ahorros
                 var ahorros = context.Query<dynamic>(
@@ -109,7 +110,7 @@ namespace ASECCC_API.Controllers
                 var resultado = new
                 {
                     Usuario = usuario,
-                    Prestamos = prestamos,
+                    SolicitudesPrestamo = solicitudesPrestamo,
                     Ahorros = ahorros,
                     Aportes = aportes
                 };
