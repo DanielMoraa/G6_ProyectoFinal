@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using System.Data;
+using System.Linq;
 
 namespace ASECCC_API.Controllers
 {
@@ -13,7 +14,7 @@ namespace ASECCC_API.Controllers
     public class PrestamosController : ControllerBase
     {
         private readonly IConfiguration _configuration;
-        
+
         public PrestamosController(IConfiguration configuration)
         {
             _configuration = configuration;
@@ -28,14 +29,12 @@ namespace ASECCC_API.Controllers
                 var parametros = new DynamicParameters();
                 parametros.Add("@UsuarioId", usuarioId);
 
-                var query = @"SELECT prestamoId, usuarioId, montoAprobado, plazo, cuotaSemanal, 
-                             tipoPrestamo, estadoPrestamo, fechaSolicitud, fechaEstado, 
-                             saldoPendiente, observaciones 
-                             FROM Prestamos 
-                             WHERE usuarioId = @UsuarioId 
-                             ORDER BY fechaSolicitud DESC";
+                var resultado = context.Query<PrestamoResponseModel>(
+                    "ObtenerPrestamosPorUsuario",
+                    parametros,
+                    commandType: CommandType.StoredProcedure
+                );
 
-                var resultado = context.Query<PrestamoResponseModel>(query, parametros);
                 return Ok(resultado);
             }
         }
@@ -49,15 +48,12 @@ namespace ASECCC_API.Controllers
                 var parametros = new DynamicParameters();
                 parametros.Add("@PrestamoId", prestamoId);
 
-                var query = @"SELECT p.prestamoId, p.usuarioId, p.montoAprobado, p.plazo, 
-                             p.cuotaSemanal, p.tipoPrestamo, p.estadoPrestamo, 
-                             p.fechaSolicitud, p.fechaEstado, p.saldoPendiente, p.observaciones,
-                             u.nombreCompleto, u.identificacion
-                             FROM Prestamos p
-                             INNER JOIN Usuario u ON p.usuarioId = u.usuarioId
-                             WHERE p.prestamoId = @PrestamoId";
+                var resultado = context.QueryFirstOrDefault<PrestamoDetalleResponseModel>(
+                    "ObtenerDetallePrestamo",
+                    parametros,
+                    commandType: CommandType.StoredProcedure
+                );
 
-                var resultado = context.QueryFirstOrDefault<PrestamoDetalleResponseModel>(query, parametros);
                 return Ok(resultado);
             }
         }
@@ -71,12 +67,12 @@ namespace ASECCC_API.Controllers
                 var parametros = new DynamicParameters();
                 parametros.Add("@PrestamoId", prestamoId);
 
-                var query = @"SELECT transaccionPrestamoId, prestamoId, montoAbonado, fechaPago 
-                             FROM PrestamosTransacciones 
-                             WHERE prestamoId = @PrestamoId 
-                             ORDER BY fechaPago DESC";
+                var resultado = context.Query<PrestamoTransaccionResponseModel>(
+                    "ObtenerTransaccionesPrestamo",
+                    parametros,
+                    commandType: CommandType.StoredProcedure
+                );
 
-                var resultado = context.Query<PrestamoTransaccionResponseModel>(query, parametros);
                 return Ok(resultado);
             }
         }
@@ -105,19 +101,13 @@ namespace ASECCC_API.Controllers
                 parametros.Add("@PlazoMeses", solicitud.PlazoMeses);
                 parametros.Add("@PropositoPrestamo", solicitud.PropositoPrestamo);
 
-                var query = @"INSERT INTO SolicitudesPrestamo 
-                             (usuarioId, estadoCivil, pagaAlquiler, montoAlquiler, nombreAcreedor, 
-                              totalCredito, abonoSemanal, saldoCredito, nombreDeudor, totalPrestamo, 
-                              saldoPrestamo, tipoPrestamo, montoSolicitud, estadoSolicitud, 
-                              cuotaSemanalSolicitud, plazoMeses, propositoPrestamo, fechaSolicitud)
-                             VALUES 
-                             (@UsuarioId, @EstadoCivil, @PagaAlquiler, @MontoAlquiler, @NombreAcreedor, 
-                              @TotalCredito, @AbonoSemanal, @SaldoCredito, @NombreDeudor, @TotalPrestamo, 
-                              @SaldoPrestamo, @TipoPrestamo, @MontoSolicitud, 'Pendiente', 
-                              @CuotaSemanalSolicitud, @PlazoMeses, @PropositoPrestamo, GETDATE());
-                             SELECT CAST(SCOPE_IDENTITY() as int)";
+                // SP debe insertar y devolver el ID (SELECT CAST(SCOPE_IDENTITY() as int))
+                var resultado = context.QuerySingle<int>(
+                    "CrearSolicitudPrestamo",
+                    parametros,
+                    commandType: CommandType.StoredProcedure
+                );
 
-                var resultado = context.QuerySingle<int>(query, parametros);
                 return Ok(resultado);
             }
         }
@@ -128,46 +118,21 @@ namespace ASECCC_API.Controllers
         {
             using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
             {
-                context.Open();
-                using (var transaction = context.BeginTransaction())
-                {
-                    try
-                    {
-                        // Registrar transacción
-                        var parametrosTransaccion = new DynamicParameters();
-                        parametrosTransaccion.Add("@PrestamoId", abono.PrestamoId);
-                        parametrosTransaccion.Add("@MontoAbonado", abono.MontoAbonado);
+                var parametros = new DynamicParameters();
+                parametros.Add("@PrestamoId", abono.PrestamoId);
+                parametros.Add("@MontoAbonado", abono.MontoAbonado);
 
-                        var queryTransaccion = @"INSERT INTO PrestamosTransacciones 
-                                                (prestamoId, montoAbonado, fechaPago)
-                                                VALUES (@PrestamoId, @MontoAbonado, GETDATE())";
+                // El SP RegistrarAbonoPrestamo debe:
+                // - Insertar en PrestamosTransacciones
+                // - Actualizar Prestamos (saldoPendiente y estadoPrestamo)
+                // - Manejar la transacción internamente
+                var resultado = context.Execute(
+                    "RegistrarAbonoPrestamo",
+                    parametros,
+                    commandType: CommandType.StoredProcedure
+                );
 
-                        context.Execute(queryTransaccion, parametrosTransaccion, transaction);
-
-                        // Actualizar saldo del préstamo
-                        var parametrosActualizar = new DynamicParameters();
-                        parametrosActualizar.Add("@PrestamoId", abono.PrestamoId);
-                        parametrosActualizar.Add("@MontoAbonado", abono.MontoAbonado);
-
-                        var queryActualizar = @"UPDATE Prestamos 
-                                               SET saldoPendiente = saldoPendiente - @MontoAbonado,
-                                                   estadoPrestamo = CASE 
-                                                       WHEN (saldoPendiente - @MontoAbonado) <= 0 THEN 'Pagado'
-                                                       ELSE estadoPrestamo 
-                                                   END
-                                               WHERE prestamoId = @PrestamoId";
-
-                        var resultado = context.Execute(queryActualizar, parametrosActualizar, transaction);
-
-                        transaction.Commit();
-                        return Ok(resultado);
-                    }
-                    catch
-                    {
-                        transaction.Rollback();
-                        return BadRequest("Error al registrar el abono");
-                    }
-                }
+                return Ok(resultado);
             }
         }
 
@@ -177,15 +142,11 @@ namespace ASECCC_API.Controllers
         {
             using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
             {
-                var query = @"SELECT sp.solicitudPrestamoId, sp.usuarioId, u.nombreCompleto, 
-                             sp.tipoPrestamo, sp.montoSolicitud, sp.estadoSolicitud, 
-                             sp.fechaSolicitud, sp.plazoMeses
-                             FROM SolicitudesPrestamo sp
-                             INNER JOIN Usuario u ON sp.usuarioId = u.usuarioId
-                             WHERE sp.estadoSolicitud = 'Pendiente'
-                             ORDER BY sp.fechaSolicitud DESC";
+                var resultado = context.Query<SolicitudPrestamoResponseModel>(
+                    "ObtenerSolicitudesPendientes",
+                    commandType: CommandType.StoredProcedure
+                );
 
-                var resultado = context.Query<SolicitudPrestamoResponseModel>(query);
                 return Ok(resultado);
             }
         }
@@ -201,15 +162,16 @@ namespace ASECCC_API.Controllers
                 {
                     try
                     {
-                        // Obtener datos de la solicitud
+                        // 1. Obtener datos de la solicitud
                         var parametrosSolicitud = new DynamicParameters();
                         parametrosSolicitud.Add("@SolicitudId", solicitud.SolicitudPrestamoId);
 
-                        var querySolicitud = @"SELECT * FROM SolicitudesPrestamo 
-                                              WHERE solicitudPrestamoId = @SolicitudId";
-
                         var solicitudData = context.QueryFirstOrDefault<SolicitudPrestamoCompleta>(
-                            querySolicitud, parametrosSolicitud, transaction);
+                            "ObtenerSolicitudPrestamoPorId",
+                            parametrosSolicitud,
+                            transaction,
+                            commandType: CommandType.StoredProcedure
+                        );
 
                         if (solicitudData == null)
                             return NotFound(new { mensaje = "Solicitud no encontrada" });
@@ -218,7 +180,7 @@ namespace ASECCC_API.Controllers
                         if (solicitudData.EstadoSolicitud != "Pendiente")
                             return BadRequest(new { mensaje = $"La solicitud ya fue {solicitudData.EstadoSolicitud.ToLower()}" });
 
-                        // Crear préstamo
+                        // 2. Crear préstamo (SP CrearPrestamo debe insertar y devolver el ID)
                         var parametrosPrestamo = new DynamicParameters();
                         parametrosPrestamo.Add("@UsuarioId", solicitudData.UsuarioId);
                         parametrosPrestamo.Add("@MontoAprobado", solicitudData.MontoSolicitud);
@@ -226,30 +188,28 @@ namespace ASECCC_API.Controllers
                         parametrosPrestamo.Add("@CuotaSemanal", solicitudData.CuotaSemanalSolicitud);
                         parametrosPrestamo.Add("@TipoPrestamo", solicitudData.TipoPrestamo);
 
-                        var queryPrestamo = @"INSERT INTO Prestamos 
-                                             (usuarioId, montoAprobado, plazo, cuotaSemanal, tipoPrestamo, 
-                                              estadoPrestamo, fechaSolicitud, fechaEstado, saldoPendiente)
-                                             VALUES 
-                                             (@UsuarioId, @MontoAprobado, @Plazo, @CuotaSemanal, @TipoPrestamo, 
-                                              'Aprobado', GETDATE(), GETDATE(), @MontoAprobado);
-                                             SELECT CAST(SCOPE_IDENTITY() as int)";
+                        var prestamoId = context.QuerySingle<int>(
+                            "CrearPrestamo",
+                            parametrosPrestamo,
+                            transaction,
+                            commandType: CommandType.StoredProcedure
+                        );
 
-                        var prestamoId = context.QuerySingle<int>(queryPrestamo, parametrosPrestamo, transaction);
-
-                        // Actualizar estado de solicitud
+                        // 3. Actualizar estado de solicitud usando SP
                         var parametrosActualizar = new DynamicParameters();
                         parametrosActualizar.Add("@SolicitudId", solicitud.SolicitudPrestamoId);
 
-                        var queryActualizar = @"UPDATE SolicitudesPrestamo 
-                                               SET estadoSolicitud = 'Aprobada', 
-                                                   fechaAprobacion = GETDATE()
-                                               WHERE solicitudPrestamoId = @SolicitudId";
-
-                        context.Execute(queryActualizar, parametrosActualizar, transaction);
+                        context.Execute(
+                            "AprobarSolicitudPrestamoEstado",
+                            parametrosActualizar,
+                            transaction,
+                            commandType: CommandType.StoredProcedure
+                        );
 
                         transaction.Commit();
-                        return Ok(new { 
-                            mensaje = "Préstamo aprobado exitosamente", 
+                        return Ok(new
+                        {
+                            mensaje = "Préstamo aprobado exitosamente",
                             prestamoId = prestamoId,
                             montoAprobado = solicitudData.MontoSolicitud,
                             usuarioId = solicitudData.UsuarioId
@@ -279,28 +239,30 @@ namespace ASECCC_API.Controllers
                         var parametrosVerificar = new DynamicParameters();
                         parametrosVerificar.Add("@SolicitudId", solicitud.SolicitudPrestamoId);
 
-                        var queryVerificar = @"SELECT estadoSolicitud FROM SolicitudesPrestamo 
-                                              WHERE solicitudPrestamoId = @SolicitudId";
+                        var solicitudData = context.QueryFirstOrDefault<SolicitudPrestamoCompleta>(
+                            "ObtenerSolicitudPrestamoPorId",
+                            parametrosVerificar,
+                            transaction,
+                            commandType: CommandType.StoredProcedure
+                        );
 
-                        var estadoActual = context.QueryFirstOrDefault<string>(queryVerificar, parametrosVerificar, transaction);
-
-                        if (estadoActual == null)
+                        if (solicitudData == null)
                             return NotFound(new { mensaje = "Solicitud no encontrada" });
 
-                        if (estadoActual != "Pendiente")
-                            return BadRequest(new { mensaje = $"La solicitud ya fue {estadoActual.ToLower()}" });
+                        if (solicitudData.EstadoSolicitud != "Pendiente")
+                            return BadRequest(new { mensaje = $"La solicitud ya fue {solicitudData.EstadoSolicitud.ToLower()}" });
 
-                        // Actualizar estado
+                        // Actualizar estado usando SP
                         var parametros = new DynamicParameters();
                         parametros.Add("@SolicitudId", solicitud.SolicitudPrestamoId);
 
-                        var query = @"UPDATE SolicitudesPrestamo 
-                                     SET estadoSolicitud = 'Rechazada',
-                                         fechaRechazo = GETDATE()
-                                     WHERE solicitudPrestamoId = @SolicitudId";
+                        var resultado = context.Execute(
+                            "RechazarSolicitudPrestamoEstado",
+                            parametros,
+                            transaction,
+                            commandType: CommandType.StoredProcedure
+                        );
 
-                        var resultado = context.Execute(query, parametros, transaction);
-                        
                         transaction.Commit();
                         return Ok(new { mensaje = "Solicitud rechazada exitosamente", resultado });
                     }
@@ -319,14 +281,13 @@ namespace ASECCC_API.Controllers
         {
             using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
             {
-                var query = @"SELECT sp.solicitudPrestamoId, sp.usuarioId, u.nombreCompleto, 
-                     sp.tipoPrestamo, sp.montoSolicitud, sp.estadoSolicitud, 
-                     sp.fechaSolicitud, sp.plazoMeses, u.identificacion
-                     FROM SolicitudesPrestamo sp
-                     INNER JOIN Usuario u ON sp.usuarioId = u.usuarioId
-                     ORDER BY sp.fechaSolicitud DESC";
+                // SP debe devolver las mismas columnas que tu SELECT original
+                var filas = context.Query<dynamic>(
+                    "ObtenerTodasSolicitudes",
+                    commandType: CommandType.StoredProcedure
+                );
 
-                var resultado = context.Query<dynamic>(query).Select(s => new
+                var resultado = filas.Select(s => new
                 {
                     SolicitudPrestamoId = (int)s.solicitudPrestamoId,
                     UsuarioId = (int)s.usuarioId,
@@ -356,12 +317,12 @@ namespace ASECCC_API.Controllers
                 var parametros = new DynamicParameters();
                 parametros.Add("@SolicitudId", solicitudId);
 
-                var query = @"SELECT sp.*, u.nombreCompleto 
-                     FROM SolicitudesPrestamo sp
-                     INNER JOIN Usuario u ON sp.usuarioId = u.usuarioId
-                     WHERE sp.solicitudPrestamoId = @SolicitudId";
-
-                var resultado = context.QueryFirstOrDefault<dynamic>(query, parametros);
+                // SP ObtenerSolicitudPorId debe hacer el JOIN con Usuario
+                var resultado = context.QueryFirstOrDefault<dynamic>(
+                    "ObtenerSolicitudPorId",
+                    parametros,
+                    commandType: CommandType.StoredProcedure
+                );
 
                 if (resultado == null)
                     return NotFound();
@@ -403,18 +364,18 @@ namespace ASECCC_API.Controllers
                 {
                     try
                     {
-                        // Si el nuevo estado es "Aprobada", crear el préstamo
                         if (request.NuevoEstado == "Aprobada")
                         {
                             // 1. Obtener datos de la solicitud
                             var parametrosSolicitud = new DynamicParameters();
                             parametrosSolicitud.Add("@SolicitudId", request.SolicitudPrestamoId);
 
-                            var querySolicitud = @"SELECT * FROM SolicitudesPrestamo 
-                                                  WHERE solicitudPrestamoId = @SolicitudId";
-
                             var solicitudData = context.QueryFirstOrDefault<SolicitudPrestamoCompleta>(
-                                querySolicitud, parametrosSolicitud, transaction);
+                                "ObtenerSolicitudPrestamoPorId",
+                                parametrosSolicitud,
+                                transaction,
+                                commandType: CommandType.StoredProcedure
+                            );
 
                             if (solicitudData == null)
                             {
@@ -422,7 +383,6 @@ namespace ASECCC_API.Controllers
                                 return NotFound(new { success = false, message = "Solicitud no encontrada" });
                             }
 
-                            // Verificar que no esté ya aprobada
                             if (solicitudData.EstadoSolicitud == "Aprobada")
                             {
                                 transaction.Rollback();
@@ -437,31 +397,29 @@ namespace ASECCC_API.Controllers
                             parametrosPrestamo.Add("@CuotaSemanal", solicitudData.CuotaSemanalSolicitud);
                             parametrosPrestamo.Add("@TipoPrestamo", solicitudData.TipoPrestamo);
 
-                            var queryPrestamo = @"INSERT INTO Prestamos 
-                                                 (usuarioId, montoAprobado, plazo, cuotaSemanal, tipoPrestamo, 
-                                                  estadoPrestamo, fechaSolicitud, fechaEstado, saldoPendiente)
-                                                 VALUES 
-                                                 (@UsuarioId, @MontoAprobado, @Plazo, @CuotaSemanal, @TipoPrestamo, 
-                                                  'Aprobado', GETDATE(), GETDATE(), @MontoAprobado);
-                                                 SELECT CAST(SCOPE_IDENTITY() as int)";
+                            var prestamoId = context.QuerySingle<int>(
+                                "CrearPrestamo",
+                                parametrosPrestamo,
+                                transaction,
+                                commandType: CommandType.StoredProcedure
+                            );
 
-                            var prestamoId = context.QuerySingle<int>(queryPrestamo, parametrosPrestamo, transaction);
-
-                            // 3. Actualizar estado de solicitud a "Aprobada"
+                            // 3. Actualizar estado a "Aprobada"
                             var parametrosActualizar = new DynamicParameters();
                             parametrosActualizar.Add("@SolicitudId", request.SolicitudPrestamoId);
-                            parametrosActualizar.Add("@NuevoEstado", "Aprobada");
 
-                            var queryActualizar = @"UPDATE SolicitudesPrestamo 
-                                                   SET estadoSolicitud = @NuevoEstado
-                                                   WHERE solicitudPrestamoId = @SolicitudId";
-
-                            context.Execute(queryActualizar, parametrosActualizar, transaction);
+                            context.Execute(
+                                "AprobarSolicitudPrestamoEstado",
+                                parametrosActualizar,
+                                transaction,
+                                commandType: CommandType.StoredProcedure
+                            );
 
                             transaction.Commit();
-                            
-                            return Ok(new { 
-                                success = true, 
+
+                            return Ok(new
+                            {
+                                success = true,
                                 message = "Préstamo aprobado y creado exitosamente",
                                 prestamoId = prestamoId,
                                 montoAprobado = solicitudData.MontoSolicitud
@@ -469,53 +427,56 @@ namespace ASECCC_API.Controllers
                         }
                         else if (request.NuevoEstado == "Rechazada")
                         {
-                            // Si es rechazo, solo actualizar el estado
                             var parametrosRechazar = new DynamicParameters();
                             parametrosRechazar.Add("@SolicitudId", request.SolicitudPrestamoId);
-                            parametrosRechazar.Add("@NuevoEstado", "Rechazada");
 
-                            var queryRechazar = @"UPDATE SolicitudesPrestamo 
-                                                 SET estadoSolicitud = @NuevoEstado
-                                                 WHERE solicitudPrestamoId = @SolicitudId";
+                            var resultado = context.Execute(
+                                "RechazarSolicitudPrestamoEstado",
+                                parametrosRechazar,
+                                transaction,
+                                commandType: CommandType.StoredProcedure
+                            );
 
-                            var resultado = context.Execute(queryRechazar, parametrosRechazar, transaction);
-                            
                             transaction.Commit();
-                            
-                            return Ok(new { 
-                                success = true, 
+
+                            return Ok(new
+                            {
+                                success = true,
                                 message = "Solicitud rechazada correctamente",
-                                resultado 
+                                resultado
                             });
                         }
                         else
                         {
-                            // Para cualquier otro estado (En Revisión, etc.)
+                            // Otros estados: SP genérico
                             var parametros = new DynamicParameters();
                             parametros.Add("@SolicitudId", request.SolicitudPrestamoId);
                             parametros.Add("@NuevoEstado", request.NuevoEstado);
 
-                            var query = @"UPDATE SolicitudesPrestamo 
-                                         SET estadoSolicitud = @NuevoEstado
-                                         WHERE solicitudPrestamoId = @SolicitudId";
+                            var resultado = context.Execute(
+                                "CambiarEstadoSolicitud",
+                                parametros,
+                                transaction,
+                                commandType: CommandType.StoredProcedure
+                            );
 
-                            var resultado = context.Execute(query, parametros, transaction);
-                            
                             transaction.Commit();
-                            
-                            return Ok(new { 
-                                success = true, 
+
+                            return Ok(new
+                            {
+                                success = true,
                                 message = $"Estado cambiado a {request.NuevoEstado}",
-                                resultado 
+                                resultado
                             });
                         }
                     }
                     catch (Exception ex)
                     {
                         transaction.Rollback();
-                        return BadRequest(new { 
-                            success = false, 
-                            message = $"Error al procesar la solicitud: {ex.Message}" 
+                        return BadRequest(new
+                        {
+                            success = false,
+                            message = $"Error al procesar la solicitud: {ex.Message}"
                         });
                     }
                 }
