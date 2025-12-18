@@ -1,54 +1,56 @@
 ﻿@{
-    var nombreUsuario = Context.Session.GetString("NombreCompleto") ?? "";
-    var nombrePerfil = Context.Session.GetString("NombrePerfil") ?? "";
+    var nombreUsuario = (Context.Session.GetString("NombreCompleto") != null ? Context.Session.GetString("NombreCompleto") : "");
+    var nombrePerfil = (Context.Session.GetString("NombrePerfil") != null ? Context.Session.GetString("NombrePerfil") : "");
     var perfilId = Context.Session.GetInt32("PerfilId") ?? 0;
 }
 
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui" />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
     <title>@(ViewData["Title"] ?? "ASECCC Digital")</title>
     <meta name="description" content="Sistema de Gestión ASECCC" />
-    <link rel="icon" href="~/lib/img/ASECCC_LOGO_2.png" type="image/x-icon" />
+    <link rel="icon" href="~/lib/img/ASECCC_LOGO_2.png" type="image/x-icon">
 
-    <!-- CSS -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&display=swap">
+    @* Sección CSS *@
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&display=swap" id="main-font-link">
     <link rel="stylesheet" href="~/lib/fonts/tabler-icons.min.css" asp-append-version="true">
     <link rel="stylesheet" href="~/lib/fonts/feather.css" asp-append-version="true">
     <link rel="stylesheet" href="~/lib/fonts/fontawesome.css" asp-append-version="true">
     <link rel="stylesheet" href="~/lib/fonts/material.css" asp-append-version="true">
-    <link rel="stylesheet" href="~/lib/css/style.css" asp-append-version="true">
+    <link rel="stylesheet" href="~/lib/css/style.css" id="main-style-link" asp-append-version="true">
     <link rel="stylesheet" href="~/lib/css/style-preset.css" asp-append-version="true">
 </head>
 
 <body data-pc-preset="preset-1" data-pc-direction="ltr" data-pc-theme="light">
-
+    <!-- [ Pre-loader ] start -->
     <div class="loader-bg">
         <div class="loader-track">
             <div class="loader-fill"></div>
         </div>
     </div>
-
-    <!-- Sidebar -->
+    <!-- [ Pre-loader ] End -->
+    <!-- [ Sidebar Menu ] start -->
     <nav class="pc-sidebar">
         <div class="navbar-wrapper">
             <div class="m-header">
                 <a asp-controller="Home" asp-action="Principal" class="b-brand text-primary">
-                    <img src="~/lib/img/ASECCC_LOGO3.1.png" alt="Logo" />
+                    <!-- ========   Change your logo from here   ============ -->
+                    <img src="~/lib/img/ASECCC_LOGO3.1.png" alt="Logo">
                 </a>
             </div>
-
             <div class="navbar-content">
                 <ul class="pc-navbar">
+                    <!-- PRINCIPAL (Todos) -->
                     <li class="pc-item">
-                        <a asp-controller="Home" asp-action="Principal" class="pc-link">
+                        <a asp-action="Principal" asp-controller="Home" class="pc-link">
                             <span class="pc-micon"><i class="ti ti-dashboard"></i></span>
                             <span class="pc-mtext">Principal</span>
                         </a>
                     </li>
 
+                    <!-- BENEFICIOS Y SERVICIOS (Todos) -->
                     <li class="pc-item">
                         <a asp-controller="BeneficiosyServicios" asp-action="Index" class="pc-link">
                             <span class="pc-micon"><i class="ti ti-gift"></i></span>
@@ -56,6 +58,7 @@
                         </a>
                     </li>
 
+                    <!-- CONTACTO Y SOPORTE (Todos) -->
                     <li class="pc-item pc-hasmenu">
                         <a href="#!" class="pc-link">
                             <span class="pc-micon"><i class="ti ti-headset"></i></span>
@@ -67,7 +70,6 @@
                                 <label>Ayuda</label>
                                 <i class="ti ti-help"></i>
                             </li>
-
                             <li class="pc-item">
                                 <a asp-controller="ContactoySoporte" asp-action="Contacto" class="pc-link">
                                     <span class="pc-micon"><i class="ti ti-mail"></i></span>
@@ -83,6 +85,7 @@
                         </ul>
                     </li>
 
+                    <!-- MI PERFIL (Todos) -->
                     <li class="pc-item pc-hasmenu">
                         <a href="#!" class="pc-link">
                             <span class="pc-micon"><i class="ti ti-user"></i></span>
@@ -94,7 +97,6 @@
                                 <label>Perfil</label>
                                 <i class="ti ti-user-circle"></i>
                             </li>
-
                             <li class="pc-item">
                                 <a asp-controller="Usuario" asp-action="EditarPerfil" class="pc-link">
                                     <span class="pc-micon"><i class="ti ti-edit"></i></span>
@@ -110,49 +112,59 @@
                         </ul>
                     </li>
 
-                    <li class="pc-item pc-hasmenu">
-                        <a href="#!" class="pc-link">
-                            <span class="pc-micon"><i class="ti ti-coin"></i></span>
-                            <span class="pc-mtext">Préstamos</span>
-                            <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
-                        </a>
-                        <ul class="pc-submenu">
-                            <li class="pc-item pc-caption">
-                                <label>Gestión de Préstamos</label>
-                                <i class="ti ti-report-money"></i>
-                            </li>
-
-                            <li class="pc-item">
-                                <a asp-controller="Prestamos" asp-action="SolicitudPrestamo" class="pc-link">
-                                    <span class="pc-micon"><i class="ti ti-file-plus"></i></span>
-                                    <span class="pc-mtext">Solicitar Préstamo</span>
-                                </a>
-                            </li>
-                            <li class="pc-item">
-                                <a asp-controller="Prestamos" asp-action="ConsultaPrestamoAsociado" class="pc-link">
-                                    <span class="pc-micon"><i class="ti ti-list"></i></span>
-                                    <span class="pc-mtext">Mis Préstamos</span>
-                                </a>
-                            </li>
-
-                            @if (perfilId == 2)
-                            {
-                                <li class="pc-item">
-                                    <a asp-controller="Prestamos" asp-action="RevisionPrestamos" class="pc-link">
-                                        <span class="pc-micon"><i class="ti ti-clipboard-check"></i></span>
-                                        <span class="pc-mtext">Revisar Solicitudes</span>
-                                    </a>
+                    <!-- PRÉSTAMOS (Mixto: Asociados y Admin) -->
+                    @if (perfilId == 1 || perfilId == 2)
+                    {
+                        <li class="pc-item pc-hasmenu">
+                            <a href="#!" class="pc-link">
+                                <span class="pc-micon"><i class="ti ti-coin"></i></span>
+                                <span class="pc-mtext">Préstamos</span>
+                                <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
+                            </a>
+                            <ul class="pc-submenu">
+                                <li class="pc-item pc-caption">
+                                    <label>Gestión de Préstamos</label>
+                                    <i class="ti ti-report-money"></i>
                                 </li>
-                                <li class="pc-item">
-                                    <a asp-controller="Prestamos" asp-action="GestionSolicitudes" class="pc-link">
-                                        <span class="pc-micon"><i class="ti ti-settings"></i></span>
-                                        <span class="pc-mtext">Gestionar Solicitudes</span>
-                                    </a>
-                                </li>
-                            }
-                        </ul>
-                    </li>
 
+                                @* Solo Asociados pueden solicitar y ver sus préstamos *@
+                                @if (perfilId == 1)
+                                {
+                                    <li class="pc-item">
+                                        <a asp-controller="Prestamos" asp-action="SolicitudPrestamo" class="pc-link">
+                                            <span class="pc-micon"><i class="ti ti-file-plus"></i></span>
+                                            <span class="pc-mtext">Solicitar Préstamo</span>
+                                        </a>
+                                    </li>
+                                    <li class="pc-item">
+                                        <a asp-controller="Prestamos" asp-action="ConsultaPrestamoAsociado" class="pc-link">
+                                            <span class="pc-micon"><i class="ti ti-list"></i></span>
+                                            <span class="pc-mtext">Mis Préstamos</span>
+                                        </a>
+                                    </li>
+                                }
+
+                                @* Solo Admin puede revisar y gestionar solicitudes *@
+                                @if (perfilId == 2)
+                                {
+                                    <li class="pc-item">
+                                        <a asp-controller="Prestamos" asp-action="RevisionPrestamos" class="pc-link">
+                                            <span class="pc-micon"><i class="ti ti-clipboard-check"></i></span>
+                                            <span class="pc-mtext">Revisar Solicitudes</span>
+                                        </a>
+                                    </li>
+                                    <li class="pc-item">
+                                        <a asp-controller="Prestamos" asp-action="GestionSolicitudes" class="pc-link">
+                                            <span class="pc-micon"><i class="ti ti-settings"></i></span>
+                                            <span class="pc-mtext">Gestionar Solicitudes</span>
+                                        </a>
+                                    </li>
+                                }
+                            </ul>
+                        </li>
+                    }
+
+                    <!-- REPORTES (Todos - reportes personales) -->
                     <li class="pc-item pc-hasmenu">
                         <a href="#!" class="pc-link">
                             <span class="pc-micon"><i class="ti ti-chart-bar"></i></span>
@@ -164,7 +176,6 @@
                                 <label>Informes y Estadísticas</label>
                                 <i class="ti ti-file-analytics"></i>
                             </li>
-
                             <li class="pc-item">
                                 <a asp-controller="Reportes" asp-action="ResumenFinanciero" class="pc-link">
                                     <span class="pc-micon"><i class="ti ti-dashboard"></i></span>
@@ -180,6 +191,7 @@
                         </ul>
                     </li>
 
+                    <!-- AHORROS Y APORTES (Mixto: Todos ven lo suyo, Admin gestiona) -->
                     <li class="pc-item pc-hasmenu">
                         <a href="#!" class="pc-link">
                             <span class="pc-micon"><i class="ti ti-wallet"></i></span>
@@ -187,54 +199,63 @@
                             <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
                         </a>
                         <ul class="pc-submenu">
-                            <li class="pc-item pc-caption">
-                                <label>Asociado</label>
-                                <i class="ti ti-user"></i>
-                            </li>
-                            <li class="pc-item">
-                                <a asp-controller="Ahorros" asp-action="MisAhorros" class="pc-link">
-                                    <span class="pc-micon"><i class="ti ti-wallet"></i></span>
-                                    <span class="pc-mtext">Mis Ahorros</span>
-                                </a>
-                            </li>
-                            <li class="pc-item">
-                                <a asp-controller="Aportes" asp-action="MisAportes" class="pc-link">
-                                    <span class="pc-micon"><i class="ti ti-coin"></i></span>
-                                    <span class="pc-mtext">Mis Aportes</span>
-                                </a>
-                            </li>
-                            <li class="pc-item">
-                                <a asp-controller="Notificaciones" asp-action="NotificacionesUsuario" class="pc-link">
-                                    <span class="pc-micon"><i class="ti ti-bell"></i></span>
-                                    <span class="pc-mtext">Mis Notificaciones</span>
-                                </a>
-                            </li>
+                            @* Sección para Asociados *@
+                            @if (perfilId == 1)
+                            {
+                                <li class="pc-item pc-caption">
+                                    <label>Mi Información</label>
+                                    <i class="ti ti-user"></i>
+                                </li>
+                                <li class="pc-item">
+                                    <a asp-controller="Ahorros" asp-action="MisAhorros" class="pc-link">
+                                        <span class="pc-micon"><i class="ti ti-wallet"></i></span>
+                                        <span class="pc-mtext">Mis Ahorros</span>
+                                    </a>
+                                </li>
+                                <li class="pc-item">
+                                    <a asp-controller="Aportes" asp-action="MisAportes" class="pc-link">
+                                        <span class="pc-micon"><i class="ti ti-coin"></i></span>
+                                        <span class="pc-mtext">Mis Aportes</span>
+                                    </a>
+                                </li>
+                                <li class="pc-item">
+                                    <a asp-controller="Notificaciones" asp-action="NotificacionesUsuario" class="pc-link">
+                                        <span class="pc-micon"><i class="ti ti-bell"></i></span>
+                                        <span class="pc-mtext">Mis Notificaciones</span>
+                                    </a>
+                                </li>
+                            }
 
-                            <li class="pc-item pc-caption">
-                                <label>Administrador</label>
-                                <i class="ti ti-shield"></i>
-                            </li>
-                            <li class="pc-item">
-                                <a asp-controller="Ahorros" asp-action="Gestionar" class="pc-link">
-                                    <span class="pc-micon"><i class="ti ti-settings"></i></span>
-                                    <span class="pc-mtext">Gestionar Ahorros</span>
-                                </a>
-                            </li>
-                            <li class="pc-item">
-                                <a asp-controller="Aportes" asp-action="Gestionar" class="pc-link">
-                                    <span class="pc-micon"><i class="ti ti-settings"></i></span>
-                                    <span class="pc-mtext">Gestionar Aportes</span>
-                                </a>
-                            </li>
-                            <li class="pc-item">
-                                <a asp-controller="Notificaciones" asp-action="NotificacionesAdmin" class="pc-link">
-                                    <span class="pc-micon"><i class="ti ti-bell-ringing"></i></span>
-                                    <span class="pc-mtext">Notificaciones</span>
-                                </a>
-                            </li>
+                            @* Sección para Administrador *@
+                            @if (perfilId == 2)
+                            {
+                                <li class="pc-item pc-caption">
+                                    <label>Administración</label>
+                                    <i class="ti ti-shield"></i>
+                                </li>
+                                <li class="pc-item">
+                                    <a asp-controller="Ahorros" asp-action="Gestionar" class="pc-link">
+                                        <span class="pc-micon"><i class="ti ti-settings"></i></span>
+                                        <span class="pc-mtext">Gestionar Ahorros</span>
+                                    </a>
+                                </li>
+                                <li class="pc-item">
+                                    <a asp-controller="Aportes" asp-action="Gestionar" class="pc-link">
+                                        <span class="pc-micon"><i class="ti ti-settings"></i></span>
+                                        <span class="pc-mtext">Gestionar Aportes</span>
+                                    </a>
+                                </li>
+                                <li class="pc-item">
+                                    <a asp-controller="Notificaciones" asp-action="NotificacionesAdmin" class="pc-link">
+                                        <span class="pc-micon"><i class="ti ti-bell-ringing"></i></span>
+                                        <span class="pc-mtext">Notificaciones</span>
+                                    </a>
+                                </li>
+                            }
                         </ul>
                     </li>
 
+                    <!-- ASOCIADOS (Solo Admin) -->
                     @if (perfilId == 2)
                     {
                         <li class="pc-item pc-hasmenu">
@@ -263,18 +284,18 @@
                             </ul>
                         </li>
                     }
-
                 </ul>
             </div>
         </div>
     </nav>
-
-    <!-- Header -->
+    <!-- [ Sidebar Menu ] end -->
+    <!-- [ Header Topbar ] start -->
     <header class="pc-header">
         <div class="header-wrapper">
-
+            <!-- [Mobile Media Block] start -->
             <div class="me-auto pc-mob-drp">
                 <ul class="list-unstyled">
+                    <!-- ======= Menu collapse Icon ===== -->
                     <li class="pc-h-item pc-sidebar-collapse">
                         <a href="#" class="pc-head-link ms-0" id="sidebar-hide">
                             <i class="ti ti-menu-2"></i>
@@ -305,88 +326,102 @@
                     </li>
                 </ul>
             </div>
-
+            <!-- [Mobile Media Block end] -->
             <div class="ms-auto">
-                <div class="dropdown pc-h-item">
-                    <a class="pc-head-link dropdown-toggle" data-bs-toggle="dropdown" href="#">
-                        <img src="~/lib/img/avatar-2.jpg" class="user-avtar" />
-                        <span>@nombreUsuario</span>
-                    </a>
-
-                    <div class="dropdown-menu dropdown-user-profile dropdown-menu-end">
-
-                        <div class="dropdown-header">
-                            <div class="d-flex mb-1">
-                                <div class="flex-shrink-0">
-                                    <img src="~/lib/img/avatar-2.jpg" alt="user-image" class="user-avtar wid-35">
+                <ul class="list-unstyled">
+                    <li class="dropdown pc-h-item header-user-profile">
+                        <a class="pc-head-link dropdown-toggle arrow-none me-0"
+                           data-bs-toggle="dropdown"
+                           href="#"
+                           role="button"
+                           aria-haspopup="false"
+                           data-bs-auto-close="outside"
+                           aria-expanded="false">
+                            <img src="~/lib/img/avatar-2.jpg" alt="user-image" class="user-avtar">
+                            <span>@nombreUsuario</span>
+                        </a>
+                        <div class="dropdown-menu dropdown-user-profile dropdown-menu-end pc-h-dropdown">
+                            <div class="dropdown-header">
+                                <div class="d-flex mb-1">
+                                    <div class="flex-shrink-0">
+                                        <img src="~/lib/img/avatar-2.jpg" alt="user-image" class="user-avtar wid-35">
+                                    </div>
+                                    <div class="flex-grow-1 ms-3" style="min-width: 0;">
+                                        <h6 class="mb-1" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                            @nombreUsuario
+                                        </h6>
+                                        <span>@nombrePerfil</span>
+                                    </div>
                                 </div>
-                                <div class="flex-grow-1 ms-3" style="min-width: 0;">
-                                    <h6 class="mb-1" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                        @nombreUsuario
-                                    </h6>
-                                    <span>@nombrePerfil</span>
+                            </div>
+                            <ul class="nav drp-tabs nav-fill nav-tabs" id="mydrpTab" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link active"
+                                            id="drp-t1"
+                                            data-bs-toggle="tab"
+                                            data-bs-target="#drp-tab-1"
+                                            type="button"
+                                            role="tab"
+                                            aria-controls="drp-tab-1"
+                                            aria-selected="true">
+                                        <i class="ti ti-user"></i> Profile
+                                    </button>
+                                </li>
+                            </ul>
+                            <div class="tab-content" id="mysrpTabContent">
+                                <div class="tab-pane fade show active" id="drp-tab-1" role="tabpanel" aria-labelledby="drp-t1" tabindex="0">
+                                    <a asp-action="EditarPerfil" asp-controller="Usuario" class="dropdown-item">
+                                        <i class="ti ti-edit-circle"></i>
+                                        <span>Editar Perfil</span>
+                                    </a>
+                                    <a asp-action="Seguridad" asp-controller="Usuario" class="dropdown-item">
+                                        <i class="ti ti-settings"></i>
+                                        <span>Seguridad</span>
+                                    </a>
+                                    <a asp-action="CerrarSesion" asp-controller="Home" class="dropdown-item">
+                                        <i class="ti ti-power"></i>
+                                        <span>Cerrar Sesión</span>
+                                    </a>
                                 </div>
                             </div>
                         </div>
-
-                        <a asp-controller="Usuario" asp-action="EditarPerfil" class="dropdown-item">Editar Perfil</a>
-                        <a asp-controller="Usuario" asp-action="Seguridad" class="dropdown-item">Seguridad</a>
-                        <a asp-controller="Home" asp-action="CerrarSesion" class="dropdown-item text-danger">Cerrar Sesión</a>
-
-                        <div class="dropdown-divider"></div>
-                        <a asp-action="EditarPerfil" asp-controller="Usuario" class="dropdown-item">
-                            <i class="ti ti-edit-circle"></i>
-                            <span>Editar Perfil</span>
-                        </a>
-                        <a asp-action="Seguridad" asp-controller="Usuario" class="dropdown-item">
-                            <i class="ti ti-settings"></i>
-                            <span>Seguridad</span>
-                        </a>
-                        <a asp-action="CerrarSesion" asp-controller="Home" class="dropdown-item">
-                            <i class="ti ti-power"></i>
-                            <span>Cerrar Sesión</span>
-                        </a>
-
-                    </div>
-                </div>
+                    </li>
+                </ul>
             </div>
         </div>
     </header>
-
-    <!-- Content -->
+    <!-- [ Header ] end -->
+    <!-- [ Main Content ] start -->
     <div class="pc-container">
         <div class="pc-content">
             @RenderBody()
         </div>
     </div>
+    <!-- [ Main Content ] end -->
 
     <footer class="pc-footer">
-        <p class="m-0">© ASECCC Digital @DateTime.Now.Year</p>
-
         <div class="footer-wrapper container-fluid">
             <div class="row">
                 <div class="col-sm my-1">
-                    <p class="m-0">
-                        © ASECCC Digital @DateTime.Now.Year, Made by
-                        <a href="https://themeforest.net/user/codedthemes" target="_blank">Codedthemes</a>
-                        &amp;
-                        <a href="https://themewagon.com/" target="_blank">ThemeWagon</a>.
-                    </p>
+                    <p class="m-0">© ASECCC Digital @DateTime.Now.Year, Made by <a href="https://themeforest.net/user/codedthemes" target="_blank">Codedthemes</a> & <a href="https://themewagon.com/">ThemeWagon</a>.</p>
                 </div>
             </div>
         </div>
     </footer>
 
-    <!-- JS  -->
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    @* Sección JS *@
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+            integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+            crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="~/lib/js/bootstrap.min.js" asp-append-version="true"></script>
     <script src="~/lib/js/popper.min.js" asp-append-version="true"></script>
     <script src="~/lib/js/simplebar.min.js" asp-append-version="true"></script>
+    <script src="~/lib/js/bootstrap.min.js" asp-append-version="true"></script>
     <script src="~/lib/js/custom-font.js" asp-append-version="true"></script>
-    <script src="~/lib/js/feather.min.js" asp-append-version="true"></script>
     <script src="~/lib/js/pcoded.js" asp-append-version="true"></script>
+    <script src="~/lib/js/feather.min.js" asp-append-version="true"></script>
     <script src="~/lib/js/comunes.js" asp-append-version="true"></script>
+
     <script>
         if (typeof layout_change === "function") layout_change('light');
         if (typeof change_box_container === "function") change_box_container('false');
