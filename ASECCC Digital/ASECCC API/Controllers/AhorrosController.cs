@@ -3,6 +3,7 @@ using Dapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
+using System.Data;
 
 namespace ASECCC_API.Controllers
 {
@@ -18,7 +19,6 @@ namespace ASECCC_API.Controllers
             _configuration = configuration;
         }
 
-
         [HttpGet]
         [Route("ObtenerAhorrosPorUsuario")]
         public IActionResult ObtenerAhorrosPorUsuario(int usuarioId)
@@ -28,27 +28,13 @@ namespace ASECCC_API.Controllers
             var parametros = new DynamicParameters();
             parametros.Add("@UsuarioId", usuarioId);
 
-            var query = @"
-                SELECT  a.ahorroId      AS AhorroId,
-                        a.usuarioId     AS UsuarioId,
-                        a.tipoAhorroId  AS TipoAhorroId,
-                        c.tipoAhorro    AS TipoAhorro,
-                        a.montoInicial  AS MontoInicial,
-                        a.montoActual   AS MontoActual,
-                        a.fechaInicio   AS FechaInicio,
-                        a.plazo         AS Plazo,
-                        a.estado        AS Estado,
-                        ''              AS NombreAsociado,
-                        ''              AS Identificacion
-                FROM Ahorros a
-                INNER JOIN CatalogoTipoAhorro c ON a.tipoAhorroId = c.tipoAhorroId
-                WHERE a.usuarioId = @UsuarioId
-                ORDER BY a.fechaInicio DESC, a.ahorroId DESC;";
+            var resultado = context.Query<AhorroResponseModel>(
+                "ObtenerAhorrosPorUsuario",
+                parametros,
+                commandType: CommandType.StoredProcedure);
 
-            var resultado = context.Query<AhorroResponseModel>(query, parametros);
             return Ok(resultado);
         }
-
 
         [HttpGet]
         [Route("ObtenerAhorrosAdmin")]
@@ -64,30 +50,13 @@ namespace ASECCC_API.Controllers
             parametros.Add("@TipoAhorroId", tipoAhorroId);
             parametros.Add("@Estado", est);
 
-            var query = @"
-                SELECT  a.ahorroId      AS AhorroId,
-                        a.usuarioId     AS UsuarioId,
-                        a.tipoAhorroId  AS TipoAhorroId,
-                        c.tipoAhorro    AS TipoAhorro,
-                        a.montoInicial  AS MontoInicial,
-                        a.montoActual   AS MontoActual,
-                        a.fechaInicio   AS FechaInicio,
-                        a.plazo         AS Plazo,
-                        a.estado        AS Estado,
-                        u.nombreCompleto AS NombreAsociado,
-                        u.identificacion AS Identificacion
-                FROM Ahorros a
-                INNER JOIN Usuario u ON a.usuarioId = u.usuarioId
-                INNER JOIN CatalogoTipoAhorro c ON a.tipoAhorroId = c.tipoAhorroId
-                WHERE   (@Nombre IS NULL OR u.nombreCompleto LIKE '%' + @Nombre + '%')
-                AND     (@TipoAhorroId IS NULL OR a.tipoAhorroId = @TipoAhorroId)
-                AND     (@Estado IS NULL OR a.estado = @Estado)
-                ORDER BY a.fechaInicio DESC, a.ahorroId DESC;";
+            var resultado = context.Query<AhorroResponseModel>(
+                "ObtenerAhorrosAdmin",
+                parametros,
+                commandType: CommandType.StoredProcedure);
 
-            var resultado = context.Query<AhorroResponseModel>(query, parametros);
             return Ok(resultado);
         }
-
 
         [HttpGet]
         [Route("ObtenerDetalleAhorro")]
@@ -98,29 +67,14 @@ namespace ASECCC_API.Controllers
             var parametros = new DynamicParameters();
             parametros.Add("@AhorroId", ahorroId);
 
-            var query = @"
-                SELECT  a.ahorroId      AS AhorroId,
-                        a.usuarioId     AS UsuarioId,
-                        a.tipoAhorroId  AS TipoAhorroId,
-                        c.tipoAhorro    AS TipoAhorro,
-                        a.montoInicial  AS MontoInicial,
-                        a.montoActual   AS MontoActual,
-                        a.fechaInicio   AS FechaInicio,
-                        a.plazo         AS Plazo,
-                        a.estado        AS Estado,
-                        u.nombreCompleto AS NombreAsociado,
-                        u.identificacion AS Identificacion
-                FROM Ahorros a
-                INNER JOIN Usuario u ON a.usuarioId = u.usuarioId
-                INNER JOIN CatalogoTipoAhorro c ON a.tipoAhorroId = c.tipoAhorroId
-                WHERE a.ahorroId = @AhorroId;";
-
-            var resultado = context.QueryFirstOrDefault<AhorroResponseModel>(query, parametros);
+            var resultado = context.QueryFirstOrDefault<AhorroResponseModel>(
+                "ObtenerDetalleAhorro",
+                parametros,
+                commandType: CommandType.StoredProcedure);
 
             if (resultado == null) return NotFound("No existe el ahorro.");
             return Ok(resultado);
         }
-
 
         [HttpGet]
         [Route("ObtenerTransaccionesAhorro")]
@@ -131,19 +85,11 @@ namespace ASECCC_API.Controllers
             var parametros = new DynamicParameters();
             parametros.Add("@AhorroId", ahorroId);
 
-            var query = @"
-                SELECT  t.transaccionAhorroId AS TransaccionId,
-                        t.ahorroId           AS AhorroId,
-                        t.fechaTransaccion   AS Fecha,
-                        ct.tipoTransaccion   AS Tipo,
-                        t.monto              AS Monto,
-                        t.descripcion        AS Descripcion
-                FROM AhorroTransacciones t
-                INNER JOIN CatalogoTipoTransaccion ct ON t.tipoTransaccionId = ct.tipoTransaccionId
-                WHERE t.ahorroId = @AhorroId
-                ORDER BY t.fechaTransaccion DESC, t.transaccionAhorroId DESC;";
+            var resultado = context.Query<AhorroTransaccionResponseModel>(
+                "ObtenerTransaccionesAhorro",
+                parametros,
+                commandType: CommandType.StoredProcedure);
 
-            var resultado = context.Query<AhorroTransaccionResponseModel>(query, parametros);
             return Ok(resultado);
         }
 
@@ -159,15 +105,11 @@ namespace ASECCC_API.Controllers
             parametros.Add("@MontoInicial", request.MontoInicial);
             parametros.Add("@Plazo", request.Plazo);
 
-            var query = @"
-                INSERT INTO Ahorros
-                    (usuarioId, tipoAhorroId, montoInicial, montoActual, fechaInicio, plazo, estado)
-                VALUES
-                    (@UsuarioId, @TipoAhorroId, @MontoInicial, @MontoInicial, GETDATE(), @Plazo, 'Activo');
+            var nuevoId = context.QuerySingle<int>(
+                "CrearAhorro",
+                parametros,
+                commandType: CommandType.StoredProcedure);
 
-                SELECT CAST(SCOPE_IDENTITY() AS INT);";
-
-            var nuevoId = context.QuerySingle<int>(query, parametros);
             return Ok(nuevoId);
         }
 
@@ -181,12 +123,11 @@ namespace ASECCC_API.Controllers
             parametros.Add("@AhorroId", ahorroId);
             parametros.Add("@NuevoMonto", nuevoMonto);
 
-            var query = @"
-                UPDATE Ahorros
-                SET montoInicial = @NuevoMonto
-                WHERE ahorroId = @AhorroId;";
+            var filas = context.Execute(
+                "ModificarMontoAhorro",
+                parametros,
+                commandType: CommandType.StoredProcedure);
 
-            var filas = context.Execute(query, parametros);
             if (filas == 0) return NotFound("No existe el ahorro.");
 
             return Ok(filas);
@@ -198,16 +139,12 @@ namespace ASECCC_API.Controllers
         {
             using var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]);
 
-            var query = @"
-                SELECT  tipoAhorroId AS TipoAhorroId,
-                        tipoAhorro   AS TipoAhorro
-                FROM CatalogoTipoAhorro
-                ORDER BY tipoAhorro;";
+            var resultado = context.Query<CatalogoTipoAhorroResponseModel>(
+                "ObtenerCatalogoTipoAhorro",
+                commandType: CommandType.StoredProcedure);
 
-            var resultado = context.Query<CatalogoTipoAhorroResponseModel>(query);
             return Ok(resultado);
         }
-
 
         [HttpDelete]
         [Route("EliminarAhorro")]
@@ -218,9 +155,11 @@ namespace ASECCC_API.Controllers
             var parametros = new DynamicParameters();
             parametros.Add("@AhorroId", ahorroId);
 
-            var query = @"DELETE FROM Ahorros WHERE ahorroId = @AhorroId;";
+            var filas = context.Execute(
+                "EliminarAhorro",
+                parametros,
+                commandType: CommandType.StoredProcedure);
 
-            var filas = context.Execute(query, parametros);
             if (filas == 0) return NotFound("No existe el ahorro.");
 
             return Ok(filas);
