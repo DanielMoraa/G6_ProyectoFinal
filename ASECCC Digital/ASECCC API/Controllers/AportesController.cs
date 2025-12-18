@@ -13,77 +13,67 @@ namespace ASECCC_API.Controllers
     public class AportesController : ControllerBase
     {
         private readonly IConfiguration _configuration;
+        public AportesController(IConfiguration configuration) => _configuration = configuration;
 
-        public AportesController(IConfiguration configuration)
+        [HttpGet("MisAportes/{usuarioId:int}")]
+        public IActionResult MisAportes(int usuarioId)
         {
-            _configuration = configuration;
+            using var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]);
+
+            var parametros = new DynamicParameters();
+            parametros.Add("@UsuarioId", usuarioId);
+
+            var resultado = context.Query<AporteResponseModel>(
+                "dbo.ObtenerAportesPorUsuario",
+                parametros,
+                commandType: CommandType.StoredProcedure
+            );
+
+            return Ok(resultado);
         }
 
-        [HttpGet]
-        [Route("ObtenerAportesPorUsuario")]
-        public IActionResult ObtenerAportesPorUsuario(int usuarioId)
+        [HttpGet("Gestionar")]
+        public IActionResult Gestionar(string? nombreAsociado, string? tipoAporte, DateTime? fechaDesde, DateTime? fechaHasta)
         {
-            using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
-            {
-                var parametros = new DynamicParameters();
-                parametros.Add("@UsuarioId", usuarioId);
+            using var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]);
 
-                var resultado = context.Query<AporteResponseModel>(
-                    "ObtenerAportesPorUsuario",
-                    parametros,
-                    commandType: CommandType.StoredProcedure);
+            var parametros = new DynamicParameters();
+            parametros.Add("@Nombre", string.IsNullOrWhiteSpace(nombreAsociado) ? null : nombreAsociado);
+            parametros.Add("@TipoAporte", string.IsNullOrWhiteSpace(tipoAporte) ? null : tipoAporte);
+            parametros.Add("@FechaDesde", fechaDesde);
+            parametros.Add("@FechaHasta", fechaHasta);
 
-                return Ok(resultado);
-            }
-        }
+            var resultado = context.Query<AporteAdminResponseModel>(
+                "dbo.ObtenerAportesAdmin",
+                parametros,
+                commandType: CommandType.StoredProcedure
+            );
 
-        [HttpGet]
-        [Route("ObtenerAportesAdmin")]
-        public IActionResult ObtenerAportesAdmin(
-            string? nombreAsociado,
-            string? tipoAporte,
-            DateTime? fechaDesde,
-            DateTime? fechaHasta)
-        {
-            using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
-            {
-                // Opcional: normalizar vacíos a null
-                var nombre = string.IsNullOrWhiteSpace(nombreAsociado) ? null : nombreAsociado;
-                var tipo = string.IsNullOrWhiteSpace(tipoAporte) ? null : tipoAporte;
-
-                var parametros = new DynamicParameters();
-                parametros.Add("@Nombre", nombre);
-                parametros.Add("@TipoAporte", tipo);
-                parametros.Add("@FechaDesde", fechaDesde);
-                parametros.Add("@FechaHasta", fechaHasta);
-
-                var resultado = context.Query<AporteAdminResponseModel>(
-                    "ObtenerAportesAdmin",
-                    parametros,
-                    commandType: CommandType.StoredProcedure);
-
-                return Ok(resultado);
-            }
+            return Ok(resultado);
         }
 
         [HttpPost]
-        [Route("CrearAporte")]
-        public IActionResult CrearAporte([FromBody] CrearAporteRequestModel request)
+        public IActionResult Crear([FromBody] CrearAporteRequestModel request)
         {
-            using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
-            {
-                var parametros = new DynamicParameters();
-                parametros.Add("@UsuarioId", request.UsuarioId);
-                parametros.Add("@TipoAporte", request.TipoAporte);
-                parametros.Add("@Monto", request.Monto);
+            if (request == null) return BadRequest("Request invalido");
+            if (request.UsuarioId <= 0) return BadRequest("UsuarioId invalido");
+            if (string.IsNullOrWhiteSpace(request.TipoAporte)) return BadRequest("TipoAporte requerido");
+            if (request.Monto <= 0) return BadRequest("Monto invalido");
 
-                var nuevoId = context.QuerySingle<int>(
-                    "CrearAporte",
-                    parametros,
-                    commandType: CommandType.StoredProcedure);
+            using var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]);
 
-                return Ok(nuevoId);
-            }
+            var parametros = new DynamicParameters();
+            parametros.Add("@UsuarioId", request.UsuarioId);
+            parametros.Add("@TipoAporte", request.TipoAporte.Trim());
+            parametros.Add("@Monto", request.Monto);
+
+            var nuevoId = context.QuerySingle<int>(
+                "dbo.CrearAporte",
+                parametros,
+                commandType: CommandType.StoredProcedure
+            );
+
+            return Ok(nuevoId);
         }
     }
 }

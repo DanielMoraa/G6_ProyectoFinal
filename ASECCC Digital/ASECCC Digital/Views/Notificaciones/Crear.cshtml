@@ -1,6 +1,8 @@
-﻿@{
+﻿@model ASECCC_Digital.Models.CrearNotificacionMasivaViewModel
+
+@{
     Layout = "_LayoutInterno";
-    ViewData["Title"] = "Crear Notificación";
+    ViewData["Title"] = "Crear Notificacion";
 }
 
 @section PageHeader {
@@ -9,11 +11,11 @@
             <div class="row align-items-center">
                 <div class="col-md-12">
                     <div class="page-header-title">
-                        <h5 class="m-b-10">Crear Notificación</h5>
+                        <h5 class="m-b-10">Crear Notificacion</h5>
                     </div>
                     <ul class="breadcrumb">
                         <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Principal">Home</a></li>
-                        <li class="breadcrumb-item"><a asp-controller="Notificaciones" asp-action="Administrador">Notificaciones</a></li>
+                        <li class="breadcrumb-item"><a asp-controller="Notificaciones" asp-action="NotificacionesAdmin">Notificaciones</a></li>
                         <li class="breadcrumb-item" aria-current="page">Crear</li>
                     </ul>
                 </div>
@@ -22,25 +24,36 @@
     </div>
 }
 
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
 <div class="row">
     <div class="col-md-8">
         <div class="card shadow-sm">
             <div class="card-body">
-                <form>
+                <form asp-controller="Notificaciones" asp-action="Crear" method="post">
+                    @Html.AntiForgeryToken()
 
                     <div class="mb-3">
-                        <label class="form-label">Título</label>
-                        <input type="text" class="form-control">
+                        <label class="form-label">Titulo</label>
+                        <input asp-for="Titulo" class="form-control" placeholder="Ej: Recordatorio de aporte" />
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label">Mensaje</label>
-                        <textarea class="form-control" rows="4"></textarea>
+                        <textarea asp-for="Contenido" class="form-control" rows="4" placeholder="Escriba el mensaje..."></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Tipo</label>
+                        <input asp-for="Tipo" class="form-control" placeholder="General" />
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label">Enviar a</label>
-                        <select class="form-select">
+                        <select asp-for="Destino" class="form-select">
                             <option value="todos">Todos los asociados</option>
                             <option value="usuarios">Usuarios activos</option>
                             <option value="admins">Administradores</option>
@@ -48,7 +61,7 @@
                     </div>
 
                     <button type="submit" class="btn btn-primary">Enviar</button>
-
+                    <a asp-controller="Notificaciones" asp-action="NotificacionesAdmin" class="btn btn-light ms-2">Cancelar</a>
                 </form>
             </div>
         </div>

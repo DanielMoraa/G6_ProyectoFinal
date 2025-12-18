@@ -16,10 +16,8 @@
             <div class="card-header">
                 <h5 class="mb-0">Gestionar Aportes</h5>
             </div>
-            <div class="card-body">
-                <p class="text-muted">
-                </p>
 
+            <div class="card-body">
                 <form method="get" class="row g-3 mb-3">
                     <div class="col-md-4">
                         <label class="form-label">Nombre del Asociado</label>
@@ -35,7 +33,6 @@
                         <select class="form-select" name="tipoAporte">
                             <option value="">Todos</option>
 
-                            @* Ordinario *@
                             @if (qTipo == "Ordinario")
                             {
                                 <option value="Ordinario" selected>Ordinario</option>
@@ -45,7 +42,6 @@
                                 <option value="Ordinario">Ordinario</option>
                             }
 
-                            @* Extraordinario *@
                             @if (qTipo == "Extraordinario")
                             {
                                 <option value="Extraordinario" selected>Extraordinario</option>
@@ -53,6 +49,15 @@
                             else
                             {
                                 <option value="Extraordinario">Extraordinario</option>
+                            }
+
+                            @if (qTipo == "Voluntario")
+                            {
+                                <option value="Voluntario" selected>Voluntario</option>
+                            }
+                            else
+                            {
+                                <option value="Voluntario">Voluntario</option>
                             }
                         </select>
                     </div>
@@ -88,8 +93,6 @@
                                 <th>Fecha</th>
                                 <th>Monto</th>
                                 <th>Tipo</th>
-                                <th>Descripción</th>
-                                <th>Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -98,32 +101,17 @@
                                 foreach (var aporte in Model)
                                 {
                                     <tr>
-                                        <td>@aporte.NombreAsociado</td>
-                                        <td>@aporte.FechaRegistro?.ToString("dd/MM/yyyy")</td>
+                                        <td>@(string.IsNullOrWhiteSpace(aporte.NombreAsociado) ? "—" : aporte.NombreAsociado)</td>
+                                        <td>@(aporte.FechaRegistro?.ToString("dd/MM/yyyy") ?? "—")</td>
                                         <td>₡@aporte.Monto.ToString("N2")</td>
                                         <td>@aporte.TipoAporte</td>
-                                        <td>—</td>
-                                        <td>
-                                            <button type="button"
-                                                    class="btn btn-sm btn-outline-primary me-1"
-                                                    disabled>
-                                                Detalles
-                                            </button>
-                                            <button type="button"
-                                                    class="btn btn-sm btn-outline-danger"
-                                                    disabled>
-                                                Eliminar
-                                            </button>
-                                        </td>
                                     </tr>
                                 }
                             }
                             else
                             {
                                 <tr>
-                                    <td colspan="6" class="text-center text-muted">
-                                        No hay registros
-                                    </td>
+                                    <td colspan="4" class="text-center text-muted">No hay registros</td>
                                 </tr>
                             }
                         </tbody>
