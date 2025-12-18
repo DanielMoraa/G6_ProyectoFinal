@@ -1,6 +1,6 @@
-﻿namespace ASECCC_Digital.Models
+﻿namespace ASECCC_API.Models
 {
-    public class BeneficioServicioModel
+    public class BeneficioServicioResponseModel
     {
         public int BeneficioId { get; set; }
         public string Nombre { get; set; } = string.Empty;

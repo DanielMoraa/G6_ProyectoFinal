@@ -1,20 +1,10 @@
 using System.Text;
-using ASECCC_Digital.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
 builder.Services.AddControllersWithViews();
 
-
-builder.Services.AddHttpClient<IBeneficiosServiciosClient, BeneficiosServiciosClient>(client =>
-{
-    var baseUrl = builder.Configuration["Valores:UrlAPI"];
-    if (string.IsNullOrWhiteSpace(baseUrl))
-        throw new InvalidOperationException("Falta configurar 'Valores:UrlAPI' en appsettings.json");
-
-    client.BaseAddress = new Uri(baseUrl);
-});
 
 
 builder.Services.AddHttpClient();

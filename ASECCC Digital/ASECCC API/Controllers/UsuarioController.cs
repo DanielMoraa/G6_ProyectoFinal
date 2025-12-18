@@ -157,7 +157,7 @@ namespace ASECCC_API.Controllers
                     commandType: CommandType.StoredProcedure
                 );
 
-                // Retornar un objeto JSON en lugar de un int directo
+               
                 return Ok(new { filasAfectadas = resultado });
             }
         }
